@@ -1,3 +1,20 @@
+Version 1.26.1
+- Add fishing support for Midnight Pre-Patch
+- Add TWW fishing skill tracking
+- Add zone mappings for TWW zones:
+- Replace deprecated `GetLootInfo()` with `GetLootSlotInfo()` and `GetNumLootItems()`
+- Add `GetLootSlotType()` filtering to process only item loot
+- Implement `IsFishingLoot()` function with fishing state tracking and 3-second timeout window
+- Fix item ID extraction from loot links with direct pattern matching fallback
+- Fix skill data loading for continent-specific fishing skills
+- Add automatic skill data refresh on `PLAYER_ENTERING_WORLD` event
+- Improve `UpdateFishingSkill()` to initialize rank from current profession skill
+- Add `GetTradeSkillData()` call to ensure trade skill UI loads properly
+- Fix fishing skill showing "0 + 0" in TWW zones
+- Fix fish not being added to journal in modern WoW
+- Fix loot tracking not detecting fishing state
+- Fix continent detection returning -1 for TWW zones
+
 Version 1.25
 - Update libraries
 - Get the core functionality working again
