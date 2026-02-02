@@ -1,3 +1,6 @@
+Version 1.26.3
+- Fix raid error by handling modern gossip quest tables and restricted strings safely in procLunkerQuests().
+
 Version 1.26.2
 - Fix FishingBuddy skill display by mapping Khaz Algar continent ID (2274) to The War Within continent detection.
 - Fix dungeon error when tooltip text is restricted by safely handling bobber tooltip string matching.

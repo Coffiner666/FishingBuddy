@@ -66,12 +66,27 @@ local function GetNPCID()
 end
 
 local function procLunkerQuests(index, title, level, isTrivial, frequency, isRepeatable, isLegendary, ...)
+	if (type(title) == "table") then
+		for idx, questInfo in ipairs(title) do
+			local questTitle = questInfo.title or questInfo.questTitle or questInfo.name
+			if (type(questTitle) == "string") then
+				local ok, n = pcall(GetItemCount, questTitle)
+				if (ok and n > 0) then
+					C_GossipInfo.SelectAvailableQuest(idx)
+				end
+			end
+		end
+		return
+	end
+
 	local isDaily = frequency == LE_QUEST_FREQUENCY_DAILY
 	local isWeekly = frequency == LE_QUEST_FREQUENCY_WEEKLY
 
-	local n = GetItemCount(title)
-	if (n > 0) then
-		C_GossipInfo.SelectAvailableQuest(index)
+	if (type(title) == "string") then
+		local ok, n = pcall(GetItemCount, title)
+		if (ok and n > 0) then
+			C_GossipInfo.SelectAvailableQuest(index)
+		end
 	end
 
 	if ... then
