@@ -1,3 +1,7 @@
+Version 1.26.2
+- Fix FishingBuddy skill display by mapping Khaz Algar continent ID (2274) to The War Within continent detection.
+- Fix dungeon error when tooltip text is restricted by safely handling bobber tooltip string matching.
+
 Version 1.26.1
 - Add fishing support for Midnight Pre-Patch
 - Add TWW fishing skill tracking

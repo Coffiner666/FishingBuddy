@@ -1650,7 +1650,11 @@ function FishLib:OnFishingBobber()
             return false
         end
 
-        return string.find(text, bobberName, 1, true) ~= nil
+        local ok, found = pcall(string.find, text, bobberName, 1, true)
+        if not ok then
+            return false
+        end
+        return found ~= nil
     end
 end
 
@@ -1744,6 +1748,7 @@ local continent_map = {
     [407] = FishLib.THE_MAELSTROM,      -- Darkmoon Island
     [1550] = FishLib.SHADOWLANDS,       -- Shadowlands
     [1978] = FishLib.DRAGONFLIGHT,      -- Dragon Isles
+    [2274] = FishLib.THE_WAR_WITHIN,    -- Khaz Algar (continent)
 }
 
 local special_maps = {
