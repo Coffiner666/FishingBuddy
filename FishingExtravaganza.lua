@@ -127,15 +127,17 @@ end
 local function CalendarGetDayEvent(monthOffset, monthDay, index)
 	local event = C_Calendar.GetDayEvent(monthOffset, monthDay, index);
 	if (event) then
-		local hour, minute;
-		if (event.sequenceType == "END") then
-			hour = event.endTime.hour;
-			minute = event.endTime.minute;
-		else
-			hour = event.startTime.hour;
-			minute = event.startTime.minute;
+		local startTime = event.startTime;
+		local endTime = event.endTime;
+		local hour = startTime and startTime.hour;
+		local minute = startTime and startTime.minute;
+		if (hour == nil) then
+			hour = endTime and endTime.hour;
 		end
-		return event.title, hour, minute, event.calendarType, event.sequenceType, event.eventType, event.texture, event.modStatus, event.inviteStatus, event.invitedBy, event.difficulty, event.inviteType, event.sequenceIndex, event.numSequenceDays, event.difficultyName;
+		if (minute == nil) then
+			minute = endTime and endTime.minute;
+		end
+		return event.title, hour or 0, minute or 0, event.calendarType, "", event.eventType, event.texture, event.modStatus, event.inviteStatus, event.invitedBy, event.difficulty, event.inviteType, event.sequenceIndex, event.numSequenceDays, event.difficultyName;
 	else
 		return nil, 0, 0, "", "", 0, "", "", 0, "", 0, 0, 0, 0, "";
 	end
@@ -176,11 +178,11 @@ local function IsTime(activate)
 	for idx=1,numDayEvents  do
 		-- Can't use eventTitle as it is localized, but eventTexture does not appear to be localized.
 		local eventTitle, eh, _, calendarType, _, eventType, eventTexture, _, inviteStatus = CalendarGetDayEvent(currentMonthOffset, currentDay, idx);
-		eventHour = eh;
-		if eventTexture == "Calendar_FishingExtravaganza" then
+		eventHour = tonumber(eh) or 0;
+		if eventTexture and eventTexture == "Calendar_FishingExtravaganza" then
 			fishingEvent = 1;
-			startHour = tonumber(eventHour)
-		elseif eventType == CALENDAR_EVENTTYPE_OTHER and string.find(eventTitle, "FISHING") then
+			startHour = eventHour
+		elseif eventType and eventType == CALENDAR_EVENTTYPE_OTHER and eventTitle and string.find(eventTitle, "FISHING") then
 			local invited = true;
 
 			if (calendarType == "GUILD") then
@@ -191,7 +193,7 @@ local function IsTime(activate)
 
 			if (invited) then
 				fishingEvent = 1;
-				startHour = tonumber(eventHour)
+				startHour = eventHour
 			end
 		end
 	end -- for CalendarGetNumDayEvents loop

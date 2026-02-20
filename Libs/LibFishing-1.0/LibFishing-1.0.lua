@@ -949,6 +949,9 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
         self.fl:SetCombat(true)
     elseif (event == "PLAYER_REGEN_ENABLED") then
         self.fl:SetCombat(false)
+        if (self.fl.pendingMouseEvent) then
+            self.fl:SetSAMouseEvent(self.fl.pendingMouseEvent)
+        end
     end
 end);
 fishlibframe:Show();
@@ -2280,8 +2283,13 @@ function FishLib:SetSAMouseEvent(buttonevent)
         self.buttonevent = buttonevent;
         local btn = _G[SABUTTONNAME];
         if ( btn ) then
-            btn:RegisterForClicks();
-            btn:RegisterForClicks(self.buttonevent);
+            if InCombatLockdown() then
+                self.pendingMouseEvent = self.buttonevent;
+            else
+                btn:RegisterForClicks();
+                btn:RegisterForClicks(self.buttonevent);
+                self.pendingMouseEvent = nil;
+            end
         end
         return true;
     end
