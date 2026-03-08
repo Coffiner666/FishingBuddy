@@ -143,6 +143,10 @@ FishingTranslations["zhCN"] = {
 	["CONFIG_OVERWALKING_ONOFF"] = "总是用木筏",
 	["CONFIG_PARTIALGEAR_INFO"] = "如果启用，即使没有装备鱼竿，只要穿着钓鱼加成装备就会使用钓鱼技能。",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "部分装备",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "钓鱼时调用宏不会再次施法.如果需要，将重新使用诱饵.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "避免重复使用钓鱼技能",
 	["CONFIG_RAIDACTION_INFO"] = "如果启用，则在特殊物品位于清单中时显示操作按钮.",

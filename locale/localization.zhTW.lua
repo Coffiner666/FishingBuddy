@@ -181,6 +181,10 @@ FishingTranslations["zhTW"] = {
 	--[[ ["CONFIG_OVERWALKING_ONOFF"] = "Always Raft",--]] 
 	["CONFIG_PARTIALGEAR_INFO"] = "啟用時，即使沒有裝備魚竿，只要身上穿著任一含釣魚加成的裝備即會使用釣魚技能。",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "不完全著裝",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "釣魚中調用巨集將不會重複施放釣魚技能.若需要會重上魚餌.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "避免重複使用釣魚技能",
 	--[[Translation missing --]]

@@ -196,6 +196,10 @@ FishingTranslations["ptBR"] = {
 	["CONFIG_PARTIALGEAR_INFO"] = "Se ativado, lança quando estiver vestindo qualquer equipamento de pescaria, mesmo se uma vara não estiver equipada.",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Equipamento Parcial",
 	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
+	--[[Translation missing --]]
 	--[[ ["CONFIG_PREVENTRECAST_INFO"] = "Invoking the macro while fishing will not cast again. Lures will be reapplied if needed.",--]] 
 	--[[Translation missing --]]
 	--[[ ["CONFIG_PREVENTRECAST_ONOFF"] = "Prevent recast",--]] 

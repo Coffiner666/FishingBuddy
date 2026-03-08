@@ -140,6 +140,10 @@ FishingTranslations["frFR"] = {
 	["CONFIG_OVERWALKING_ONOFF"] = "Toujours le radeau",
 	["CONFIG_PARTIALGEAR_INFO"] = "Si activé, lancé lorsque vous portez au moins une seule tenue de pêche, même si une canne n'est pas équipée.",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Tenue partielle",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "Exécuter la macro tant que la ligne n'a pas été relancée. Les appâts seront appliqués si besoin.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "Empêcher de relancer",
 	["CONFIG_RAIDACTION_INFO"] = "Si elle est activée, affichez un bouton d'action lorsque l'objet spécial est dans votre inventaire.",

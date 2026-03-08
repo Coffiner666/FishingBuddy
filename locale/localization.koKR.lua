@@ -180,6 +180,10 @@ FishingTranslations["koKR"] = {
 	--[[ ["CONFIG_OVERWALKING_ONOFF"] = "Always Raft",--]] 
 	["CONFIG_PARTIALGEAR_INFO"] = "선택하면, 낚시대를 장착하지 않았어도 어떤 낚시 도구라도 착용하고 있다면 낚시를 시작합니다.",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "일부 장비",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "낚시가 다시 시전되지 않으면 이 매크로를 사용합니다. 찌는 필요하면 다시 적용됩니다.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "재 시전 방지",
 	--[[Translation missing --]]

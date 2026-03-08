@@ -164,6 +164,8 @@ FishingTranslations["enUS"] = {
     CONFIG_FLYINGCAST_INFO  = "If enabled, allow casting while flying.",
     CONFIG_PARTIALGEAR_ONOFF = "Partial Outfit",
     CONFIG_PARTIALGEAR_INFO  = "If enabled, cast when wearing any fishing gear at all, even if a pole is not equipped.",
+    CONFIG_WITHOUTGEAR_ONOFF = "Without gear",
+    CONFIG_WITHOUTGEAR_INFO  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",
 
     CONFIG_FISHINGCHARM_INFO  = "If enabled, use the fishing charm while in Pandaria.",
     CONFIG_TUSKAARSPEAR_INFO  = "If enabled, do the complicated dance to use the Tuskaar Spear.",

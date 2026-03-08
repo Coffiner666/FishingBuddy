@@ -186,6 +186,10 @@ Draznar's Style-Wertung: %d]=],
 	--[[ ["CONFIG_OVERWALKING_ONOFF"] = "Always Raft",--]] 
 	["CONFIG_PARTIALGEAR_INFO"] = "Wenn aktiviert, wird jeder Gegenstand benutzt der einen Angel Bonus enthält,auch wenn man mit keiner Angel ausgestattet ist.",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Bonus Ausrüstung",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "Wird während des Angelns das Makro erneut aufgerufen wird nicht neu geangelt. Der Köder wird erneut angewendet, falls nötig.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "Erneutes Angeln verhindern",
 	--[[Translation missing --]]

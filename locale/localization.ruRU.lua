@@ -137,6 +137,10 @@ FishingTranslations["ruRU"] = {
 	["CONFIG_OVERWALKING_ONOFF"] = "Всегда Плот",
 	["CONFIG_PARTIALGEAR_INFO"] = "если вкл., кастовать, когда одето любое рыболовное снаряжение, даже без удочки. ",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Частичное снаряжение",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "Вызов макроса до тех пор пока не закинул удочку. Приманки будут повторно применены, если это необходимо.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "Предотвратить повторный заброс",
 	["CONFIG_RAIDACTION_INFO"] = "Если включено, покажите кнопку действия, когда специальный предмет находится в инвентаре.",

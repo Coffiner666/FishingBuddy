@@ -187,6 +187,10 @@ FishingTranslations["itIT"] = {
 	--[[ ["CONFIG_OVERWALKING_ONOFF"] = "Always Raft",--]] 
 	["CONFIG_PARTIALGEAR_INFO"] = "Se abilitato, lancia ache quando non è presente nessun equipaggiamento da pesca, anche se non è stata equipaggiata nemmeno la canna.",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Equipaggiamento Parziale",
+	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
 	["CONFIG_PREVENTRECAST_INFO"] = "Eseguire la macro durante la pesca non farà rilanciare niente. Le esche verranno riapplicate se necessario.",
 	["CONFIG_PREVENTRECAST_ONOFF"] = "Previeni rilancio",
 	--[[Translation missing --]]
