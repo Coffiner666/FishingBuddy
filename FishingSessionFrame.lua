@@ -8,6 +8,7 @@ local SESSION_TAB = "Session"
 local SESSION_INFO = "Shows catch statistics for the current session."
 local SESSION_RESET = "Reset Session"
 local SESSION_EMPTY = "No fishing data collected in this session yet."
+local MAX_BREAKDOWN_LINES = 4
 
 local SessionStats = {}
 SessionStats.__index = SessionStats
@@ -17,7 +18,6 @@ local function FormatDuration(seconds)
     local hours = math.floor(seconds / 3600)
     local minutes = math.floor((seconds % 3600) / 60)
     local secs = seconds % 60
-
     if hours > 0 then
         return string.format("%dh %02dm %02ds", hours, minutes, secs)
     end
@@ -31,7 +31,7 @@ local function SortedPairsByCount(values)
     end
     table.sort(sorted, function(a, b)
         if a.count == b.count then
-            return a.key < b.key
+            return tostring(a.key) < tostring(b.key)
         end
         return a.count > b.count
     end)
@@ -97,7 +97,6 @@ function SessionStats:AddCatch(id, name, quantity, mapId, subzone, poolhint)
         name = name,
         quantity = quantity,
         zone = zoneLabel,
-        at = GetTime(),
     }
 
     if poolhint then
@@ -145,13 +144,10 @@ local tracker = setmetatable({}, SessionStats)
 tracker:Reset()
 FBI.SessionStats = tracker
 
-local function CreateLabel(parent, anchorTo, x, y, text, template, r, g, b)
+local function CreateLabel(parent, anchorTo, x, y, text, template)
     local label = parent:CreateFontString(nil, "ARTWORK", template or "GameFontNormal")
     label:SetJustifyH("LEFT")
     label:SetPoint("TOPLEFT", anchorTo, "BOTTOMLEFT", x or 0, y or 0)
-    if r then
-        label:SetTextColor(r, g, b)
-    end
     label:SetText(text or "")
     return label
 end
@@ -259,24 +255,11 @@ local function CreateSessionFrame()
     reset:SetText(SESSION_RESET)
     reset:SetScript("OnClick", ResetSessionStats)
 
-    local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -18)
-    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 16)
-    scrollFrame:SetClipsChildren(true)
-
-    local content = CreateFrame("Frame", nil, scrollFrame)
-    content:SetSize(520, 900)
-    content:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
-    scrollFrame:SetScrollChild(content)
-
-    frame.scrollFrame = scrollFrame
-    frame.content = content
-
-    local summaryHeader = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    local summaryHeader = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     summaryHeader:SetJustifyH("LEFT")
-    summaryHeader:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
+    summaryHeader:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -20)
     summaryHeader:SetText("Summary")
-    local summaryLabels = {}
+
     local summaryValues = {}
     local entries = {
         { key = "sessionTime", text = "Session time" },
@@ -294,56 +277,37 @@ local function CreateSessionFrame()
         local y = index == 1 and -12 or -8
         local label = CreateLabel(frame, anchor, 0, y, info.text..":", "GameFontHighlightSmall")
         local value = CreateValue(frame, label, 12)
-        summaryLabels[info.key] = label
         summaryValues[info.key] = value
         anchor = label
     end
-
-    frame.summaryLabels = summaryLabels
     frame.summaryValues = summaryValues
 
-    local lastCatchLabel = CreateLabel(content, anchor, 0, -16, "Last catch:", "GameFontHighlightSmall")
-    local lastCatchValue = CreateLabel(content, lastCatchLabel, 0, -8, "", "GameFontHighlight")
-    lastCatchValue:SetWidth(500)
+    local lastCatchLabel = CreateLabel(frame, anchor, 0, -16, "Last catch:", "GameFontHighlightSmall")
+    local lastCatchValue = CreateLabel(frame, lastCatchLabel, 0, -8, "", "GameFontHighlight")
+    lastCatchValue:SetWidth(520)
     lastCatchValue:SetJustifyH("LEFT")
     frame.lastCatchValue = lastCatchValue
 
-    local topFishHeader = CreateLabel(content, lastCatchValue, 0, -18, "Top catches", "GameFontNormal")
-
+    local topFishHeader = CreateLabel(frame, lastCatchValue, 0, -18, "Top catches", "GameFontNormal")
     frame.topFishLines = {}
     frame.topZoneLines = {}
 
     anchor = topFishHeader
-    for index = 1, 8 do
-        local line = CreateLabel(content, anchor, 0, -10, "", "GameFontHighlightSmall")
-        line:SetWidth(500)
+    for index = 1, MAX_BREAKDOWN_LINES do
+        local line = CreateLabel(frame, anchor, 0, -10, "", "GameFontHighlightSmall")
+        line:SetWidth(520)
         frame.topFishLines[index] = line
         anchor = line
     end
 
-    local topZoneHeader = CreateLabel(content, anchor, 0, -18, "Top zones", "GameFontNormal")
-
+    local topZoneHeader = CreateLabel(frame, anchor, 0, -18, "Top zones", "GameFontNormal")
     anchor = topZoneHeader
-    for index = 1, 8 do
-        local line = CreateLabel(content, anchor, 0, -10, "", "GameFontHighlightSmall")
-        line:SetWidth(500)
+    for index = 1, MAX_BREAKDOWN_LINES do
+        local line = CreateLabel(frame, anchor, 0, -10, "", "GameFontHighlightSmall")
+        line:SetWidth(520)
         frame.topZoneLines[index] = line
         anchor = line
     end
-
-    content:SetHeight(720)
-
-    frame:SetScript("OnSizeChanged", function(self, width, height)
-        local contentWidth = math.max(320, width - 70)
-        content:SetWidth(contentWidth)
-        lastCatchValue:SetWidth(contentWidth - 20)
-        for _, line in ipairs(frame.topFishLines) do
-            line:SetWidth(contentWidth - 20)
-        end
-        for _, line in ipairs(frame.topZoneLines) do
-            line:SetWidth(contentWidth - 20)
-        end
-    end)
 
     return frame
 end
