@@ -1142,7 +1142,7 @@ local function GetFishingItem(itemtable)
                 if ( info.check ) then
                     doit, itemid, it = info.check(info, info.spell, doit, itemid);
                 elseif (info.toy) then
-                    _, itemid = C_ToyBox.GetToyInfo(itemid);
+                    itemid = C_ToyBox.GetToyInfo(itemid);
                 end
                 if ( doit ) then
                     return doit, itemid, info[CurLoc], it or info.type;

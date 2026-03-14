@@ -122,7 +122,7 @@ local function RaftingPlan(queue)
         buff = RaftItems[itemid].spell;
         name = RaftItems[itemid][CurLoc];
         if RaftItems[itemid].toy then
-            _, itemid = C_ToyBox.GetToyInfo(BOARD_ID)
+            itemid = C_ToyBox.GetToyInfo(itemid)
         end
         if buff then
             local _, et = FL:HasAnyBuff(RaftItems)

@@ -1,5 +1,6 @@
 Version 1.26.5
 - Fix easy cast with Reusable Oversized Bobber by using the correct toy item ID (GitHub issue #2)
+- Fix remaining toy item ID handling for Trawler Totem, raft toys, and generic toy-based fishing item use.
 - Fix calendar taint error in FishingExtravaganza.lua by avoiding restricted `sequenceType` comparisons.
 - Improve calendar event parsing resilience when title/type/texture fields are missing.
 - Fix `ADDON_ACTION_BLOCKED` from `RegisterForClicks` by deferring mouse click registration updates until out of combat.
