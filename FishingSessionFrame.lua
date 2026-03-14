@@ -262,9 +262,11 @@ local function CreateSessionFrame()
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -18)
     scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 16)
+    scrollFrame:SetClipsChildren(true)
 
     local content = CreateFrame("Frame", nil, scrollFrame)
     content:SetSize(520, 900)
+    content:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
     scrollFrame:SetScrollChild(content)
 
     frame.scrollFrame = scrollFrame
