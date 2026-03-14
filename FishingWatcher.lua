@@ -1063,6 +1063,9 @@ FBI.Commands[FBConstants.CURRENT].func =
         if ( what and what == FBConstants.RESET) then
             totalCurrent = 0;
             fishdata = {};
+            if FBI.SessionStats then
+                FBI.SessionStats:Reset();
+            end
             FBI:WatchUpdate();
             return true;
         end

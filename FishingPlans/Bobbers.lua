@@ -127,14 +127,14 @@ end
 
 local function PickRandomBobber(bobbersetting)
 	local baits = {};
-	for _,id in ipairs(bobbersetting) do
-		if (PlayerHasToy(id) and C_ToyBox.IsToyUsable(id)) then
-			if not PLANS:ItemCooldownOn(id) then
-				_, id = C_ToyBox.GetToyInfo(id);
-				tinsert(baits, id);
+		for _,id in ipairs(bobbersetting) do
+			if (PlayerHasToy(id) and C_ToyBox.IsToyUsable(id)) then
+				if not PLANS:ItemCooldownOn(id) then
+					id = C_ToyBox.GetToyInfo(id);
+					tinsert(baits, id);
+				end
 			end
 		end
-	end
 	if (#baits > 0) then
 		return baits[math.random(1, #baits)];
 	end
@@ -143,19 +143,21 @@ end
 
 local function UseThisBobber(itemid, info)
 	local canuse;
-    if (info.toy) then
-        canuse = false
-		if (PlayerHasToy(itemid) and C_ToyBox.IsToyUsable(itemid)) then
-			if not PLANS:ItemCooldownOn(itemid) then
-                _, itemid = C_ToyBox.GetToyInfo(itemid);
-                canuse = true
-            end
-        end
+    local itemtype;
+	    if (info.toy) then
+	        canuse = false
+			if (PlayerHasToy(itemid) and C_ToyBox.IsToyUsable(itemid)) then
+				if not PLANS:ItemCooldownOn(itemid) then
+	                itemid = C_ToyBox.GetToyInfo(itemid);
+	                canuse = true
+	                itemtype = "toy"
+	            end
+	        end
     else
         canuse = (GetItemCount(itemid) > 0)
 	end
     if (canuse and not FL:HasBuff(info.spell)) then
-        return info.spell, canuse
+        return itemid, canuse, itemtype
     end
 
     -- return nil
@@ -182,10 +184,10 @@ local function SpecialBobberPlan()
 				return
 			end
 
-			local itemid, canuse = UseThisBobber(id, bobber);
+			local itemid, canuse, itemtype = UseThisBobber(id, bobber);
 			if canuse then
 				ClearSpecialBobberBuffs()
-				PLANS:AddEntry(itemid, bobber[CurLoc], "toy")
+				PLANS:AddEntry(itemid, bobber[CurLoc], itemtype)
 				return
 			end
 		end
@@ -270,7 +272,7 @@ if ( FBI.Debugging ) then
 			for _,id in ipairs(bobberkeys) do
 				if (PlayerHasToy(id) and C_ToyBox.IsToyUsable(id)) then
 					if not PLANS:ItemCooldownOn(id) then
-						_, id = C_ToyBox.GetToyInfo(id);
+						id = C_ToyBox.GetToyInfo(id);
 						tinsert(baits, id);
 					end
 				end

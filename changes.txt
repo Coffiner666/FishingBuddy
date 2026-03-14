@@ -1,4 +1,5 @@
 Version 1.26.5
+- Fix easy cast with Reusable Oversized Bobber by using the correct toy item ID (GitHub issue #2)
 - Fix calendar taint error in FishingExtravaganza.lua by avoiding restricted `sequenceType` comparisons.
 - Improve calendar event parsing resilience when title/type/texture fields are missing.
 - Fix `ADDON_ACTION_BLOCKED` from `RegisterForClicks` by deferring mouse click registration updates until out of combat.
@@ -1784,4 +1785,3 @@ Version 0.7.6
 
 Version 0.7.5
 - fix a bad memory leak on the outfit display page
-

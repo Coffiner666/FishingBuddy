@@ -1051,7 +1051,7 @@ end)
 
 -- handle option keys for enabling casting
 local key_actions = {
-    [FBConstants.KEYS_NONE] = function(mouse) return mouse ~= FL:GetSAMouseEvent(); end,
+    [FBConstants.KEYS_NONE] = function(mouse) return true; end,
     [FBConstants.KEYS_SHIFT] = function(mouse) return IsShiftKeyDown(); end,
     [FBConstants.KEYS_CTRL] = function(mouse) return IsControlKeyDown(); end,
     [FBConstants.KEYS_ALT] = function(mouse) return IsAltKeyDown(); end,
@@ -1845,6 +1845,7 @@ function FBI:OnEvent(event, ...)
         FBI.OptionsFrame.HandleOptions(name, "Interface\\Icons\\INV_Fishingpole_02", CastingOptions);
         FBI.OptionsFrame.HandleOptions(ENABLE, "Interface\\CIons\\IMV\\NV_misc_pocketwatch_03", EnablingOptions);
         FBI.OptionsFrame.HandleOptions(nil, nil, InvisibleOptions);
+        FBI:OptionsUpdate(false, false);
 
         -- defaults to true
         if (FishingBuddy_Player and FishingBuddy_Player["Settings"] and FishingBuddy_Player["Settings"]["ShowBanner"] == nil) then
@@ -2095,4 +2096,3 @@ function FBI:Testing(line)
     end
     tinsert(FishingBuddy_Info["Testing"], line);
 end
-

@@ -469,7 +469,7 @@ local function ProcessFishLoot()
 		-- handle things we can't actually count that might be in our fish (e.g. Garrison Resources)
 		if (id) then
 			-- Fishing pool check? poolhint and (index == 1)
-			FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quality, nil, it, st, false);
+			FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quality, nil, it, st, info.poolhint);
 		end
 		lootcount = lootcount + 1;
 		lootcheck = true;
@@ -520,4 +520,3 @@ FBI.Commands[FBConstants.UPDATEDB].func =
 		FBI:Print(FBConstants.UPDATEDB_MSG, count);
 		return true;
 	end;
-
