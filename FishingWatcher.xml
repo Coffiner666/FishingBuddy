@@ -7,7 +7,7 @@
 	</Size>
     </FontString>
 
-    <Frame name="FishingWatchFrame" frameStrata="LOW" toplevel="true" enableMouse="false" clampedToScreen="true" movable="true" parent="UIParent" hidden="true">
+    <Frame name="FishingWatchFrame" frameStrata="MEDIUM" toplevel="true" enableMouse="true" clampedToScreen="true" movable="true" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
 				FBEnvironment.Watcher_OnLoad(self);
@@ -16,9 +16,86 @@
 				FBEnvironment.Watcher_OnUpdate(self, elapsed);
 			</OnUpdate>
 		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground" file="Interface\Tooltips\UI-Tooltip-Background">
+					<Color r="0.03" g="0.05" b="0.08" a="0.88"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentHeader" file="Interface\ChatFrame\ChatFrameBackground">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+					<Size>
+						<AbsDimension x="0" y="30"/>
+					</Size>
+					<Color r="0.10" g="0.16" b="0.22" a="0.95"/>
+				</Texture>
+				<Texture name="$parentInset" file="Interface\ChatFrame\ChatFrameBackground">
+					<Color r="0" g="0" b="0" a="0.25"/>
+					<Size>
+						<AbsDimension x="0" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<AbsDimension x="3" y="-33"/>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+							<AbsDimension x="-3" y="3"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture name="$parentBorderTop" file="Interface\Buttons\WHITE8X8">
+					<Color r="0.36" g="0.47" b="0.58" a="0.9"/>
+					<Size>
+						<AbsDimension x="0" y="1"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBorderBottom" file="Interface\Buttons\WHITE8X8">
+					<Color r="0.20" g="0.27" b="0.34" a="0.85"/>
+					<Size>
+						<AbsDimension x="0" y="1"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBorderLeft" file="Interface\Buttons\WHITE8X8">
+					<Color r="0.20" g="0.27" b="0.34" a="0.85"/>
+					<Size>
+						<AbsDimension x="1" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBorderRight" file="Interface\Buttons\WHITE8X8">
+					<Color r="0.20" g="0.27" b="0.34" a="0.85"/>
+					<Size>
+						<AbsDimension x="1" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<Frames>
-			<Button name="FishingWatchTab" inherits="PanelTabButtonTemplate" hidden="true">
-				<Size x="64" y="32"/>
+			<Button name="FishingWatchTab" inherits="PanelTabButtonTemplate">
+				<Size x="120" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="FishingWatchFrame" relativePoint="TOPLEFT">
 						<AbsDimension x="0" y="2"/>
