@@ -194,6 +194,10 @@ Puntuación estilo Draznar's: %d ]=],
 	["CONFIG_PARTIALGEAR_INFO"] = "Si activo, lanzar cuando cualquier equipo de pesca este equipado, incluso si una caña de pescar no está equipada",
 	["CONFIG_PARTIALGEAR_ONOFF"] = "Equipado parcialmente",
 	--[[Translation missing --]]
+	--[[ ["CONFIG_WITHOUTGEAR_ONOFF"] = "Without gear",--]]
+	--[[Translation missing --]]
+    --[[ ["CONFIG_WITHOUTGEAR_INFO"]  = "If enabled, cast no matter what is equipped, including not having any fishing gear or a pole.",--]]
+	--[[Translation missing --]]
 	--[[ ["CONFIG_PREVENTRECAST_INFO"] = "Invoking the macro while fishing will not cast again. Lures will be reapplied if needed.",--]] 
 	--[[Translation missing --]]
 	--[[ ["CONFIG_PREVENTRECAST_ONOFF"] = "Prevent recast",--]] 

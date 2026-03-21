@@ -618,6 +618,12 @@ local CastingOptions = {
         ["v"] = 1,
         ["parents"] = { ["EasyCast"] = "d" },
         ["default"] = false },
+    WithoutGear = {
+        text = FBConstants.CONFIG_WITHOUTGEAR_ONOFF,
+        tooltip = FBConstants.CONFIG_WITHOUTGEAR_INFO,
+        v = 1,
+        parents = { EasyCast = "d" },
+        default = false },
     ["WatchBobber"] = {
         ["text"] = FBConstants.CONFIG_WATCHBOBBER_ONOFF,
         ["tooltip"] = FBConstants.CONFIG_WATCHBOBBER_INFO,
@@ -1069,6 +1075,10 @@ end
 local tuskarrswap = false;
 
 function FBI:ReadyForFishing()
+    if self:GetSettingBool("WithoutGear") then
+        return true
+    end
+
     local id = FL:GetMainHandItem(true);
     local holdingspear = self:GetSettingBool("UseTuskarrSpear") and (id == 88535);
     local ready = tuskarrswap or holdingspear or FL:IsFishingReady(self:GetSettingBool("PartialGear") );
