@@ -1,5 +1,9 @@
+Version 1.26.6
+- Add option to easy-cast even with no gear equipped.
+- Fix easy cast with Reusable Oversized Bobber by using the correct toy item ID.
+- Fix taint by replacing quest-title GetItemCount calls with questID/itemID and IsQuestCompletable checks.
+
 Version 1.26.5
-- Fix easy cast with Reusable Oversized Bobber by using the correct toy item ID (GitHub issue #2)
 - Fix calendar taint error in FishingExtravaganza.lua by avoiding restricted `sequenceType` comparisons.
 - Improve calendar event parsing resilience when title/type/texture fields are missing.
 - Fix `ADDON_ACTION_BLOCKED` from `RegisterForClicks` by deferring mouse click registration updates until out of combat.
