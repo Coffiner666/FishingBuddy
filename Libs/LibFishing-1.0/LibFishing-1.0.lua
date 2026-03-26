@@ -1640,7 +1640,9 @@ function FishLib:OnFishingBobber()
         return false
     end
 
-    if GameTooltip:IsVisible() and GameTooltip:GetAlpha() == 1 then
+    -- Retail can mark tooltip alpha as a restricted number in mouse handlers.
+    -- Visibility plus a guarded text match is sufficient here.
+    if GameTooltip:IsVisible() then
         local text = GameTooltipTextLeft1 and GameTooltipTextLeft1:GetText()
 
         -- Only operate on real Lua strings

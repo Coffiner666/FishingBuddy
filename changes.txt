@@ -1,3 +1,6 @@
+Version 1.26.7
+- Fix a Retail taint in bobber detection by removing a restricted tooltip alpha comparison.
+
 Version 1.26.6
 - Add option to easy-cast even with no gear equipped.
 - Fix easy cast with Reusable Oversized Bobber by using the correct toy item ID.
