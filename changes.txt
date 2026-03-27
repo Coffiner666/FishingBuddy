@@ -7,6 +7,7 @@ Version 1.26.6
 - Fix taint by replacing quest-title GetItemCount calls with questID/itemID and IsQuestCompletable checks.
 
 Version 1.26.5
+- Make the Fish Watcher behave as a movable standalone window with a visible header and side-position default.
 - Fix calendar taint error in FishingExtravaganza.lua by avoiding restricted `sequenceType` comparisons.
 - Improve calendar event parsing resilience when title/type/texture fields are missing.
 - Fix `ADDON_ACTION_BLOCKED` from `RegisterForClicks` by deferring mouse click registration updates until out of combat.
