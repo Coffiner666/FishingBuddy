@@ -62,7 +62,21 @@ QuestFish[200084] = {
 }
 
 local function GetNPCID()
-	return tonumber(string.match(UnitGUID('npc') or UnitGUID('target') or '', 'Creature%-.-%-.-%-.-%-.-%-(.-)%-'))
+	-- Keep all GUID handling inside pcall to avoid touching restricted strings
+	local success, npcID = pcall(function()
+		local guid = UnitGUID('npc')
+		if not guid then
+			guid = UnitGUID('target')
+		end
+		if not guid then
+			return nil
+		end
+		return tonumber(string.match(guid, 'Creature%-.-%-.-%-.-%-.-%-(.-)%-'))
+	end)
+	if success then
+		return npcID
+	end
+	return nil
 end
 
 local QuestItemsByQuestID = {};
