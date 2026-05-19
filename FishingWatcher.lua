@@ -9,10 +9,7 @@ local _
 local GSB = function(...) return FBI:GetSettingBool(...); end;
 
 local MAX_FISHINGWATCH_LINES = 1;
-local WATCHDRAGGER_SHOW_DELAY = 0.5;
-
 local ELAPSEDTIME_LINE = 1;
-local WATCHDRAGGER_FADE_TIME = 0.25;
 
 local ZoneFishingTime = 0;
 local TotalTimeFishing = nil;
@@ -227,32 +224,12 @@ function FWF:DisplayFishLine(fish, label, area)
     return label..line
 end
 
--- handle special frame actions
-local function FadingFinished()
-    FishingWatchHighlight:Hide();
-    FishingWatchTab:Hide();
-    FishingWatchTab.finishedFunc = nil;
-end
-
-local function ShowDraggerFrame()
-    UIFrameFadeIn(FishingWatchHighlight, WATCHDRAGGER_FADE_TIME, 0, 0.15);
-    UIFrameFadeIn(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 0, 1.0);
-    FishingWatchFrame:EnableMouse(true);
-end
-
-local function HideDraggerFrame()
-    LW.OnDragStop(FishingWatchFrame);
-    FishingWatchFrame:EnableMouse(false);
-    if (FishingWatchTab:IsShown()) then
-        FishingWatchTab.finishedFunc = FadingFinished;
-        UIFrameFadeOut(FishingWatchHighlight, WATCHDRAGGER_FADE_TIME, 0.15, 0);
-        UIFrameFadeOut(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 1.0, 0);
-    end
-end
-
 function FBI:ResetWatcherFrame(update)
     FishingWatchFrame:ClearAllPoints();
-    FishingWatchFrame:SetPoint("CENTER", "UIParent", "CENTER", 0, 0);
+    FishingWatchFrame:SetPoint("TOPRIGHT", "UIParent", "TOPRIGHT", -120, -220);
+    if FishingWatchFrame.SavePosition then
+        FishingWatchFrame:SavePosition();
+    end
     if ( update ) then
         FBI.WatchUpdate();
     end
@@ -565,7 +542,7 @@ end
 WatchEvents["VARIABLES_LOADED"] = function()
     ZoneFishingTime = 0;
 
-    FishingWatchTab.Text:SetText(FBConstants.NAME);
+    FishingWatchTab.Text:SetText(FBConstants.WATCHER_TAB);
     PanelTemplates_TabResize(FishingWatchTab, 10);
 
     FBI.OptionsFrame.HandleOptions(FBConstants.WATCHER_TAB, "Interface\\Icons\\Inv_Misc_Spyglass_03", WatcherOptions);
@@ -578,11 +555,15 @@ WatchEvents["VARIABLES_LOADED"] = function()
 
     LW:Embed(FishingWatchFrame)
     FishingWatchFrame:RegisterConfig(FishingBuddy_Player["WatcherLocation"], libwindow_names);
+    local location = FishingBuddy_Player["WatcherLocation"];
+    if location and location["solo_point"] == nil then
+        location["solo_x"] = -120;
+        location["solo_y"] = -220;
+        location["solo_point"] = "TOPRIGHT";
+    end
     FishingWatchFrame:RestorePosition();
     FishingWatchFrame:MakeDraggable();
-    FishingWatchFrame:EnableMouse(false);
-
-    local location = FishingBuddy_Player["WatcherLocation"];
+    FishingWatchFrame:EnableMouse(true);
     if location and location["grp_x"] == nil then
         for _,key in ipairs({"x", "y", "point", "scale"}) do
             location["grp_"..key] = location["solo_"..key];
@@ -900,7 +881,6 @@ function FBI:WatchUpdate()
 end
 
 local function HideOnEscape()
-    HideDraggerFrame();
 end
 
 local function TimerUpdate()
@@ -965,48 +945,9 @@ function FBEnvironment.Watcher_OnLoad(self)
     FWF:RegisterLineHandler(UpdateCoinLines, FWF.LAST_PRIORITY, false, true)
 end
 
-local isDragging = nil;
-local hover;
 FBEnvironment.Watcher_OnUpdate = function(self, elapsed)
     if ( self:IsVisible() ) then
         UpdateWatcherPosition();
-        if ( isDragging ) then
-            return;
-        end
-        if ( MouseIsOver(self) or MouseIsOver(FishingWatchTab) ) then
-            local xPos, yPos = GetCursorPosition();
-            if ( hover ) then
-                if ( hover.xPos == xPos and hover.yPos == yPos ) then
-                    hover.hoverTime = hover.hoverTime + elapsed;
-                else
-                    hover.hoverTime = 0;
-                    hover.xPos = xPos;
-                    hover.yPos = yPos;
-                end
-            else
-                hover = {};
-                hover.hoverTime = 0;
-                hover.xPos = xPos;
-                hover.yPos = yPos;
-            end
-            if ( hover.hoverTime > WATCHDRAGGER_SHOW_DELAY ) then
-                if (not hover.fadedin ) then
-                    ShowDraggerFrame();
-                end
-                hover.fadedin = 1;
-            end
-        else
-            if ( hover ) then
-                hover.hoverTime = hover.hoverTime + elapsed;
-                if ( hover.hoverTime > WATCHDRAGGER_SHOW_DELAY ) then
-                    HideDraggerFrame();
-                    hover = nil;
-                end
-            end
-        end
-    elseif ( hover ) then
-        HideDraggerFrame();
-        hover = nil;
     end
 end
 
