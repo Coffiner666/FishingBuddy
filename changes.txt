@@ -1,5 +1,7 @@
 Version 1.26.9
-- Add support for patch 12.0.7 (Revelations). Bump TOC interface to 120007 so the addon loads without the out-of-date flag. No removed/deprecated 12.0.7 APIs are used by the addon, so no code changes were required beyond the interface bump.
+- Add support for patch 12.0.7 (Revelations). Bump TOC interface to 120007.
+- Fix fish tracking and the Fish Watcher not working on modern Retail. Since patch 10.0.2 fishing poles are profession tools equipped in the dedicated fishing tool slot (INVSLOT_FISHING_TOOL) rather than the main hand, but LibFishing's IsFishingPole() only inspected the main-hand slot, so pole detection failed. Because catch recording and the watcher key off pole detection, neither worked. IsFishingPole() now recognizes a pole in the fishing tool slot on Retail (falling back to the classic main-hand check on Classic).
+- Fix GetPoleBonus() reading the pole's fishing-skill bonus from the empty main-hand slot on Retail (it now reads the fishing tool slot), so the pole's skill bonus is counted again.
 
 Version 1.26.8
 - Fix additional Retail secret-string taint in FishingQuests.lua GetNPCID() by removing direct GUID string comparisons and moving all GUID parsing into pcall().

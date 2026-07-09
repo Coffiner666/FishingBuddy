@@ -1500,6 +1500,14 @@ end
 
 function FishLib:IsFishingPole(itemLink)
     if (not itemLink) then
+        -- Modern WoW (10.0.2+): fishing poles are profession tools that equip into
+        -- the dedicated fishing tool slot, not the main hand. Anything worn in that
+        -- slot is a fishing tool, so treat it as a pole. Fall back to the classic
+        -- main-hand weapon check for Classic clients where the slot does not exist.
+        local toolLink = self:GetFishingToolItem();
+        if ( toolLink ) then
+            return true;
+        end
         -- Get the main hand item texture
         itemLink = self:GetMainHandItem();
     end
@@ -2463,8 +2471,11 @@ end
 -- and the bonus from a lure, if any, separately
 function FishLib:GetPoleBonus()
     if (self:IsFishingPole()) then
+        -- Modern WoW (10.0.2+): the pole equips into the fishing tool slot, not the
+        -- main hand, so read the pole's bonus from the correct slot on retail.
+        local poleslot = IsRetail() and INVSLOT_FISHING_TOOL or INVSLOT_MAINHAND;
         -- get the total bonus for the pole
-        local total = self:FishingBonusPoints(INVSLOT_MAINHAND, true);
+        local total = self:FishingBonusPoints(poleslot, true);
         local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
         if ( hmhe ) then
             local id;
