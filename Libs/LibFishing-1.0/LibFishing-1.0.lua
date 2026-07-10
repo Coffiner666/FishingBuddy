@@ -921,12 +921,24 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
     elseif ( event == "CHAT_MSG_SKILL" ) then
         self.fl.caughtSoFar = 0;
     elseif ( event == "LOOT_OPENED" ) then
-        -- Check if we're fishing by verifying we have a fishing pole equipped
-        if (self.fl:IsFishingPole() or self.fl:IsFishingReady(true)) then
+        -- Count only if the fishing channel just ran; on Retail a pole in the
+        -- tool slot no longer implies we're actually fishing
+        if (self.fl:IsFishingPole() and self.fl.lastCastTime and (GetTime() - self.fl.lastCastTime) < 3.0) then
             self.fl.caughtSoFar = self.fl.caughtSoFar + 1;
         end
     elseif ( event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" ) then
         if (arg1 == "player" ) then
+            local spellid = select(3, ...);
+            if ( not self.fl.fishingSpellId ) then
+                local fid = self.fl:GetFishingSpellInfo();
+                if ( fid and fid > 9 ) then
+                    -- don't cache the placeholder id returned before profession data loads
+                    self.fl.fishingSpellId = fid;
+                end
+            end
+            if ( spellid and spellid == self.fl.fishingSpellId ) then
+                self.fl.lastCastTime = GetTime();
+            end
             self.fl:UpdateLureInventory();
         end
     elseif ( event == "PLAYER_ENTERING_WORLD" ) then
