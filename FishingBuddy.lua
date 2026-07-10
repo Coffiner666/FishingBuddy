@@ -1723,19 +1723,14 @@ local lastFishingTime = 0
 local FISHING_LOOT_TIMEOUT = 3.0  -- seconds to consider loot as fishing-related after fishing ends
 
 -- Modern WoW removed IsFishingLoot() global function
--- This checks if we're currently looting fish by checking if we're actively fishing or recently were.
--- Only cast-derived signals belong here: on Retail the fishing tool slot is always occupied, so
--- "pole equipped" no longer implies "actively fishing".
+-- Loot only counts as fish when the fishing channel itself just ran. Fishing mode can
+-- stay active for a minute between casts -- plenty of time to kill and loot a mob --
+-- so neither the mode nor an equipped pole may qualify loot on their own.
 local function IsFishingLoot()
-    -- Check if we're currently fishing (tracked by FishingModeFrame)
-    if FBI:AreWeFishing() then
-        lastFishingTime = GetTime()
-        return true
-    end
-
-    -- The fishing channel ran moments ago (covers casts made straight from the action bar)
+    -- The fishing channel ran moments ago (looting the bobber always ends the channel)
     local lastcast = GetLastCastTime()
     if lastcast and (GetTime() - lastcast) < FISHING_LOOT_TIMEOUT then
+        lastFishingTime = GetTime()
         return true
     end
 
