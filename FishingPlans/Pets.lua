@@ -77,6 +77,7 @@ local function unwind(table)
 end
 
 local resetPet = nil;
+local didSwap = false;
 
 local menupets = {};
 local FISHINGCREATURES = {}
@@ -152,6 +153,21 @@ local PetOptions = {
 }
 
 local PetEvents = {}
+
+local function SummonWhenSafe(petid, previous, tries)
+    -- Summoning is itself a cast: done synchronously it eats the fishing cast
+    -- (or cancels an active channel), so wait for a quiet moment between casts
+    if ( FL:InCombat() or UnitChannelInfo("player") or UnitCastingInfo("player") ) then
+        if ( tries > 0 ) then
+            C_Timer.After(3.0, function() SummonWhenSafe(petid, previous, tries - 1) end)
+        end
+        return
+    end
+    resetPet = previous;
+    didSwap = true;
+    C_PetJournal.SummonPetByGUID(petid);
+end
+
 local function StartFishingPets()
     -- only do the fluff stuff if we're actually wearing any fishing gear
     -- we don't do this stuff if we're "no pole equipped" fishing
@@ -159,7 +175,7 @@ local function StartFishingPets()
         return
     end
 
-	local petsetting = FBI:GetSetting(PETSETTING)
+	local petsetting = GetSetting(PETSETTING)
 	if (petsetting == nil) then
 		-- timing issue if we start off fishing. Hrm.
 		petsetting = PET_NONE
@@ -189,8 +205,8 @@ local function StartFishingPets()
 			end
 
 			if ( petid and petid ~= nowpet ) then
-                resetPet = nowpet;
-                C_PetJournal.SummonPetByGUID(petid);
+                -- defer so the summon can never steal the cast that started fishing mode
+                C_Timer.After(2.0, function() SummonWhenSafe(petid, nowpet, 10) end)
             end
         end
     end
@@ -229,8 +245,11 @@ EventRegistry:RegisterCallback(FBConstants.FISHING_DISABLED_EVT, function(starte
 	if ( logout ) then
 		FishingBuddy_Player["ResetPet"] = resetPet;
 	else
-        if (DoPetReset(resetPet)) then
+        -- only restore if we actually swapped pets; DoPetReset(nil) toggle-dismisses
+        -- the current pet, which is only right when we summoned it ourselves
+        if ( didSwap and DoPetReset(resetPet) ) then
             resetPet = nil;
+            didSwap = false;
         end
 	end
 end)
