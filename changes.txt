@@ -3,6 +3,7 @@ Version 1.26.10
 - Fix the Fish Watcher's "only while fishing" mode: casting Fishing (from the action bar or easy cast) now starts fishing mode, so the watcher appears while actually fishing and hides after the idle timeout; removing the pole from the tool slot (or main hand) now stops fishing mode immediately.
 - Fix fishing mode auto-starting at login when "partial gear" is enabled: the initial gear state is now seeded without triggering fishing mode.
 - Filter UNIT_SPELLCAST channel events to the player, so other units' casts no longer pollute cast tracking.
+- Fix cast tracking comparing channel events against the wrong spell id: the events report the castable Fishing spell (131474), but the handlers checked the profession id (131490), so the cast timestamp never refreshed at channel end and the loot gate rejected real catches. Channel handlers now accept both ids, with a fishing-mode safety net on channel stop.
 - Fix the fishing-pet fluff feature stealing the cast: summoning a battle pet at fishing-mode start ran synchronously inside the easy-cast click, so the first double-click summoned a pet instead of casting. The summon is now deferred to a quiet moment between casts (never while casting or channeling). The pet option also now respects the Fishing Fluff master toggle, as the options UI already implied, and the end-of-fishing pet restore only runs when the addon actually swapped pets (it used to toggle-dismiss the player's own pet).
 
 Version 1.26.9

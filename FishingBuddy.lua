@@ -1280,12 +1280,18 @@ local fishing_buff = 131474;
 local fishing_spellid = 131490;
 local current_spell_id = nil
 
+-- The channel events report the castable Fishing spell (131474, fishing_buff),
+-- not the profession spell id kept in fishing_spellid
+local function IsFishingCast(spellid)
+    return spellid and (spellid == fishing_buff or spellid == fishing_spellid);
+end
+
 CaptureEvents["UNIT_SPELLCAST_CHANNEL_START"] = function(unit, lineid, spellid)
     if ( unit ~= "player" ) then
         return;
     end
     current_spell_id = spellid
-    if current_spell_id == fishing_spellid then
+    if IsFishingCast(spellid) then
         SetLastCastTime();
         -- any fishing cast counts as fishing, no matter how it was cast
         FishingModeFrame:EmitStartFishing();
@@ -1297,7 +1303,8 @@ CaptureEvents["UNIT_SPELLCAST_CHANNEL_STOP"] = function(unit, lineid, spellid)
         return;
     end
     -- we may want to wait a bit here for any buff to come back...
-    if current_spell_id == fishing_spellid then
+    -- the fishing-mode check is a safety net in case the spell id drifts again
+    if IsFishingCast(current_spell_id) or FishingModeFrame.fishing_started then
         SetLastCastTime();
     end
     current_spell_id = nil
@@ -1308,7 +1315,7 @@ CaptureEvents["UNIT_SPELLCAST_INTERRUPTED"] = function(unit, lineid, spellid)
     if ( unit ~= "player" ) then
         return;
     end
-    if current_spell_id == fishing_spellid then
+    if IsFishingCast(current_spell_id) then
         SetLastCastTime();
     end
     current_spell_id = nil

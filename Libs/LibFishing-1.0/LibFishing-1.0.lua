@@ -936,7 +936,8 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
                     self.fl.fishingSpellId = fid;
                 end
             end
-            if ( spellid and spellid == self.fl.fishingSpellId ) then
+            -- 131474 is the castable Fishing spell the channel events report on Retail
+            if ( spellid and (spellid == self.fl.fishingSpellId or spellid == 131474) ) then
                 self.fl.lastCastTime = GetTime();
             end
             self.fl:UpdateLureInventory();
