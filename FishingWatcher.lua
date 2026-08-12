@@ -967,13 +967,25 @@ end
 
 local isDragging = nil;
 local hover;
+local function IsFrameMouseOver(frame)
+    if not frame then
+        return false;
+    end
+    if frame.IsMouseOver then
+        return frame:IsMouseOver();
+    end
+    if _G.MouseIsOver then
+        return _G.MouseIsOver(frame);
+    end
+    return false;
+end
 FBEnvironment.Watcher_OnUpdate = function(self, elapsed)
     if ( self:IsVisible() ) then
         UpdateWatcherPosition();
         if ( isDragging ) then
             return;
         end
-        if ( MouseIsOver(self) or MouseIsOver(FishingWatchTab) ) then
+        if ( IsFrameMouseOver(self) or IsFrameMouseOver(FishingWatchTab) ) then
             local xPos, yPos = GetCursorPosition();
             if ( hover ) then
                 if ( hover.xPos == xPos and hover.yPos == yPos ) then

@@ -63,9 +63,25 @@ local MacroEditBox =
     ["setting"] = "MacroName"
 };
 
+local function GetMacroLimits()
+    local maxAccount = _G.MAX_ACCOUNT_MACROS;
+    local maxCharacter = _G.MAX_CHARACTER_MACROS;
+
+    if ((not maxAccount or not maxCharacter) and _G.Constants and _G.Constants.MacroConsts) then
+        maxAccount = maxAccount or _G.Constants.MacroConsts.MAX_ACCOUNT_MACROS;
+        maxCharacter = maxCharacter or _G.Constants.MacroConsts.MAX_CHARACTER_MACROS;
+    end
+
+    -- Keep old behavior if Blizzard constants are unavailable for any reason.
+    maxAccount = tonumber(maxAccount) or 120;
+    maxCharacter = tonumber(maxCharacter) or 18;
+    return maxAccount, maxCharacter;
+end
+
 -- Move a macro from global to perchar, or vice versa
 local function GetMacroIndex(macroname)
-    for idx = 1, _G.MAX_ACCOUNT_MACROS + _G.MAX_CHARACTER_MACROS do
+    local numglobal, numperchar = GetNumMacros();
+    for idx = 1, numglobal + numperchar do
         local name, icon, body = GetMacroInfo(idx)
         if (name and macroname == name) then
             return idx;
@@ -76,9 +92,10 @@ end
 local function CreateOrUpdateMacro(name, icon, body, perchar)
     if not FL:InCombat() then
         if name and icon and body then
+            local maxAccount = GetMacroLimits();
             local exists = GetMacroIndex(name);
             if (exists) then
-                local isglobal = (exists <= _G.MAX_ACCOUNT_MACROS);
+                local isglobal = (exists <= maxAccount);
                 if ((perchar and isglobal) or (not perchar and not isglobal)) then
                     -- switch per char and global
                     DeleteMacro(name);
@@ -154,14 +171,15 @@ end
 
 function FBI:CreateFishingMacro()
     local numglobal,numperchar = GetNumMacros();
+    local maxAccount, maxCharacter = GetMacroLimits();
     local perchar = nil;
     local fullup;
     if (GSB("ToonMacro")) then
-        if (numperchar >= _G.MAX_CHARACTER_MACROS) then
+        if (numperchar >= maxCharacter) then
             fullup = FBConstants.NOCREATEMACROPER;
         end
     else
-        if (numglobal >= _G.MAX_ACCOUNT_MACROS) then
+        if (numglobal >= maxAccount) then
             fullup = FBConstants.NOCREATEMACROGLOB;
         end
     end

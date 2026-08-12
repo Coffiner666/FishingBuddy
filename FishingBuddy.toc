@@ -1,4 +1,4 @@
-## Interface: 120007
+## Interface: 120007, 120100
 ## Title: Fishing Buddy
 ## Version: 1.26.10
 ## X-Curse-Project-ID: 15093
