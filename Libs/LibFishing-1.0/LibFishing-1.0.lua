@@ -921,12 +921,25 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
     elseif ( event == "CHAT_MSG_SKILL" ) then
         self.fl.caughtSoFar = 0;
     elseif ( event == "LOOT_OPENED" ) then
-        -- Check if we're fishing by verifying we have a fishing pole equipped
-        if (self.fl:IsFishingPole() or self.fl:IsFishingReady(true)) then
+        -- Count only if the fishing channel just ran; on Retail a pole in the
+        -- tool slot no longer implies we're actually fishing
+        if (self.fl:IsFishingPole() and self.fl.lastCastTime and (GetTime() - self.fl.lastCastTime) < 3.0) then
             self.fl.caughtSoFar = self.fl.caughtSoFar + 1;
         end
     elseif ( event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" ) then
         if (arg1 == "player" ) then
+            local spellid = select(3, ...);
+            if ( not self.fl.fishingSpellId ) then
+                local fid = self.fl:GetFishingSpellInfo();
+                if ( fid and fid > 9 ) then
+                    -- don't cache the placeholder id returned before profession data loads
+                    self.fl.fishingSpellId = fid;
+                end
+            end
+            -- 131474 is the castable Fishing spell the channel events report on Retail
+            if ( spellid and (spellid == self.fl.fishingSpellId or spellid == 131474) ) then
+                self.fl.lastCastTime = GetTime();
+            end
             self.fl:UpdateLureInventory();
         end
     elseif ( event == "PLAYER_ENTERING_WORLD" ) then
@@ -1500,6 +1513,14 @@ end
 
 function FishLib:IsFishingPole(itemLink)
     if (not itemLink) then
+        -- Modern WoW (10.0.2+): fishing poles are profession tools that equip into
+        -- the dedicated fishing tool slot, not the main hand. Anything worn in that
+        -- slot is a fishing tool, so treat it as a pole. Fall back to the classic
+        -- main-hand weapon check for Classic clients where the slot does not exist.
+        local toolLink = self:GetFishingToolItem();
+        if ( toolLink ) then
+            return true;
+        end
         -- Get the main hand item texture
         itemLink = self:GetMainHandItem();
     end
@@ -2463,8 +2484,11 @@ end
 -- and the bonus from a lure, if any, separately
 function FishLib:GetPoleBonus()
     if (self:IsFishingPole()) then
+        -- Modern WoW (10.0.2+): the pole equips into the fishing tool slot, not the
+        -- main hand, so read the pole's bonus from the correct slot on retail.
+        local poleslot = IsRetail() and INVSLOT_FISHING_TOOL or INVSLOT_MAINHAND;
         -- get the total bonus for the pole
-        local total = self:FishingBonusPoints(INVSLOT_MAINHAND, true);
+        local total = self:FishingBonusPoints(poleslot, true);
         local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
         if ( hmhe ) then
             local id;

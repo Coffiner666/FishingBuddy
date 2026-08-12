@@ -420,7 +420,7 @@ end
 local FishingModeFrame = CreateFrame("Frame");
 
 FishingModeFrame.fishing_started = false
-FishingModeFrame.geared_up = false
+FishingModeFrame.geared_up = nil -- unknown until the first gear check seeds it
 FishingModeFrame.double_click_handler = nil
 
 function FishingModeFrame:SetAutoPoleLocation(clear)
@@ -528,9 +528,18 @@ local function AutoPoleEvent(self, event, arg1, arg2, arg3, arg4, arg5)
             event == "EQUIPMENT_SWAP_FINISHED" or
             event == "BAG_UPDATE" or
             event == "PLAYER_ALIVE") then
+        if ( event == "PLAYER_EQUIPMENT_CHANGED" or event == "EQUIPMENT_SWAP_FINISHED" ) then
+            -- No pole in the fishing tool slot or main hand -> we can't be fishing
+            if ( self.fishing_started and not FL:IsFishingPole() ) then
+                self:EmitStopFishing()
+            end
+        end
         if FBI:GetSettingBool("PartialGear") then
             local has_gear = FL:IsFishingReady(true)
-            if has_gear ~= self.geared_up then
+            if self.geared_up == nil then
+                -- seed the initial gear state without starting fishing mode
+                self.geared_up = has_gear
+            elseif has_gear ~= self.geared_up then
                 if self.geared_up then
                     self:EmitStopFishing()
                 else
@@ -1271,16 +1280,31 @@ local fishing_buff = 131474;
 local fishing_spellid = 131490;
 local current_spell_id = nil
 
+-- The channel events report the castable Fishing spell (131474, fishing_buff),
+-- not the profession spell id kept in fishing_spellid
+local function IsFishingCast(spellid)
+    return spellid and (spellid == fishing_buff or spellid == fishing_spellid);
+end
+
 CaptureEvents["UNIT_SPELLCAST_CHANNEL_START"] = function(unit, lineid, spellid)
+    if ( unit ~= "player" ) then
+        return;
+    end
     current_spell_id = spellid
-    if current_spell_id == fishing_spellid then
+    if IsFishingCast(spellid) then
         SetLastCastTime();
+        -- any fishing cast counts as fishing, no matter how it was cast
+        FishingModeFrame:EmitStartFishing();
     end
 end
 
 CaptureEvents["UNIT_SPELLCAST_CHANNEL_STOP"] = function(unit, lineid, spellid)
+    if ( unit ~= "player" ) then
+        return;
+    end
     -- we may want to wait a bit here for any buff to come back...
-    if current_spell_id == fishing_spellid then
+    -- the fishing-mode check is a safety net in case the spell id drifts again
+    if IsFishingCast(current_spell_id) or FishingModeFrame.fishing_started then
         SetLastCastTime();
     end
     current_spell_id = nil
@@ -1288,7 +1312,10 @@ CaptureEvents["UNIT_SPELLCAST_CHANNEL_STOP"] = function(unit, lineid, spellid)
 end
 
 CaptureEvents["UNIT_SPELLCAST_INTERRUPTED"] = function(unit, lineid, spellid)
-    if current_spell_id == fishing_spellid then
+    if ( unit ~= "player" ) then
+        return;
+    end
+    if IsFishingCast(current_spell_id) then
         SetLastCastTime();
     end
     current_spell_id = nil
@@ -1703,21 +1730,23 @@ local lastFishingTime = 0
 local FISHING_LOOT_TIMEOUT = 3.0  -- seconds to consider loot as fishing-related after fishing ends
 
 -- Modern WoW removed IsFishingLoot() global function
--- This checks if we're currently looting fish by checking if we're actively fishing or recently were
+-- Loot only counts as fish when the fishing channel itself just ran. Fishing mode can
+-- stay active for a minute between casts -- plenty of time to kill and loot a mob --
+-- so neither the mode nor an equipped pole may qualify loot on their own.
 local function IsFishingLoot()
-    -- Check if we're currently fishing (tracked by FishingModeFrame)
-    if FBI:AreWeFishing() then
+    -- The fishing channel ran moments ago (looting the bobber always ends the channel)
+    local lastcast = GetLastCastTime()
+    if lastcast and (GetTime() - lastcast) < FISHING_LOOT_TIMEOUT then
         lastFishingTime = GetTime()
         return true
     end
-    
+
     -- Also check if we were fishing recently (handles delayed loot windows)
     if lastFishingTime > 0 and (GetTime() - lastFishingTime) < FISHING_LOOT_TIMEOUT then
         return true
     end
-    
-    -- Final fallback: check if fishing pole is equipped
-    return FL:IsFishingPole() or FL:IsFishingReady(true)
+
+    return false
 end
 
 -- Return true if we might be looting from a barrel.

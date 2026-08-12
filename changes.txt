@@ -1,3 +1,15 @@
+Version 1.26.10
+- Fix all loot being recorded as fishing catches on Retail. The 1.26.9 tool-slot detection made "pole equipped" always true (the profession tool slot is permanently occupied), and IsFishingLoot() fell back to that equipment check. Loot now only counts as fish when the fishing channel itself ran within the last few seconds (looting the bobber always ends the channel, so real catches land inside that window; mob kills cannot). Same fix applied to LibFishing's caught-so-far counter.
+- Fix the Fish Watcher's "only while fishing" mode: casting Fishing (from the action bar or easy cast) now starts fishing mode, so the watcher appears while actually fishing and hides after the idle timeout; removing the pole from the tool slot (or main hand) now stops fishing mode immediately.
+- Fix fishing mode auto-starting at login when "partial gear" is enabled: the initial gear state is now seeded without triggering fishing mode.
+- Filter UNIT_SPELLCAST channel events to the player, so other units' casts no longer pollute cast tracking.
+- Fix cast tracking comparing channel events against the wrong spell id: the events report the castable Fishing spell (131474), but the handlers checked the profession id (131490), so the cast timestamp never refreshed at channel end and the loot gate rejected real catches. Channel handlers now accept both ids, with a fishing-mode safety net on channel stop.
+- Fix the fishing-pet fluff feature stealing the cast: summoning a battle pet at fishing-mode start ran synchronously inside the easy-cast click, so the first double-click summoned a pet instead of casting. The summon is now deferred to a quiet moment between casts (never while casting or channeling). The pet option also now respects the Fishing Fluff master toggle, as the options UI already implied, and the end-of-fishing pet restore only runs when the addon actually swapped pets (it used to toggle-dismiss the player's own pet).
+
+Version 1.26.9
+- Add support for patch 12.0.7 (Revelations). Bump TOC interface to 120007.
+- Fix fish tracking and the Fish Watcher not working on modern Retail. Since patch 10.0.2 fishing poles are profession tools equipped in the dedicated fishing tool slot (INVSLOT_FISHING_TOOL) rather than the main hand, but LibFishing's IsFishingPole() only inspected the main-hand slot, so pole detection failed. Because catch recording and the watcher key off pole detection, neither worked. IsFishingPole() now recognizes a pole in the fishing tool slot on Retail (falling back to the classic main-hand check on Classic).
+- Fix GetPoleBonus() reading the pole's fishing-skill bonus from the empty main-hand slot on Retail (it now reads the fishing tool slot), so the pole's skill bonus is counted again.
 Version 1.26.9
 - Fix FishingMacro.lua error when MAX_ACCOUNT_MACROS / MAX_CHARACTER_MACROS are nil on Retail by using safe macro limit resolution and GetNumMacros()-based indexing.
 - Fix FishingWatcher.lua OnUpdate error by replacing direct MouseIsOver(...) calls with a Retail-safe frame mouseover compatibility check.
