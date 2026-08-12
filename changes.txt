@@ -1,3 +1,7 @@
+Version 1.26.9
+- Fix FishingMacro.lua error when MAX_ACCOUNT_MACROS / MAX_CHARACTER_MACROS are nil on Retail by using safe macro limit resolution and GetNumMacros()-based indexing.
+- Fix FishingWatcher.lua OnUpdate error by replacing direct MouseIsOver(...) calls with a Retail-safe frame mouseover compatibility check.
+
 Version 1.26.8
 - Fix additional Retail secret-string taint in FishingQuests.lua GetNPCID() by removing direct GUID string comparisons and moving all GUID parsing into pcall().
 
