@@ -493,6 +493,9 @@ function FBI:HasRaftBuff()
 end
 
 local function AutoPoleCheck(self, ...)
+    if ( FL:InCombat() ) then
+        return;
+    end
     if (self.zone) then
         local distance = FL:GetDistanceTo(self.zone, self.x, self.y)
         if distance then
@@ -1145,8 +1148,53 @@ function FBEnvironment:PostCastUpdate()
     end
 end
 
+local FISHING_ATTENTION_BUFF = 394009;
+local easyCastAwaitingConfirmation = false;
+
+local function HasFishingAttentionBuff()
+    if ( InCombatLockdown() ) then
+        return false;
+    end
+    local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, FISHING_ATTENTION_BUFF);
+    return ok and aura ~= nil;
+end
+
+local function ActivateConfirmedEasyCast(tries)
+    if ( UnitChannelInfo("player") ) then
+        if ( tries > 0 ) then
+            C_Timer.After(0.1, function()
+                ActivateConfirmedEasyCast(tries - 1);
+            end);
+        end
+        return;
+    end
+    FishingModeFrame:EmitStartFishing();
+end
+
+local function ConfirmEasyCast(tries)
+    if ( not easyCastAwaitingConfirmation ) then
+        return;
+    end
+    if ( HasFishingAttentionBuff() ) then
+        easyCastAwaitingConfirmation = false;
+        FBI.pending_fishing_started = GetTime();
+        FBI.pending_fishing_loot = FBI.pending_fishing_started;
+        if ( FBI.ShowFishingWatcher ) then
+            FBI:ShowFishingWatcher();
+        end
+        ActivateConfirmedEasyCast(300);
+    elseif ( tries > 0 ) then
+        C_Timer.After(0.1, function()
+            ConfirmEasyCast(tries - 1);
+        end);
+    else
+        easyCastAwaitingConfirmation = false;
+    end
+end
+
 local function HideAwayAll(self, button, down)
     FishingBuddy_PostCastUpdateFrame:Show();
+    ConfirmEasyCast(15);
 end
 
 local function GetFishingItem(itemtable)
@@ -1384,7 +1432,6 @@ local function CentralCasting()
     -- put on a lure if we need to
     if ( HijackCheck() and not StealClick() ) then
         PLANS:ExecutePlans()
-        FishingModeFrame:EmitStartFishing();
         local update, id, _, itemtype = FBI:GetUpdateLure();
         if (update and id) then
             FL:InvokeLuring(id, itemtype);
@@ -1395,6 +1442,7 @@ local function CentralCasting()
                 FL:SaveTooltipText();
             end
             local macrotext = FBI:CastAndThrow()
+            easyCastAwaitingConfirmation = true;
             if macrotext then
                 FL:InvokeMacro(macrotext)
             else
@@ -1471,6 +1519,7 @@ end
 -- even if we didn't do the switch to a fishing pole
 local resetClickToMove = nil;
 function FBI:EnterFishingMode()
+    self.watcher_fishing_pending = nil;
     if ( not FBI.StartedFishing ) then
         -- Disable Click-to-Move if we're fishing
         if ( GetCVarSafe("autoInteract") == 1 ) then
@@ -1484,13 +1533,17 @@ function FBI:EnterFishingMode()
             local LSM = FBI.LureStateManager;
             LSM:SetLure({["b"] = lure})
         end
-        FBI.StartedFishing = GetTime();
+        FBI.StartedFishing = self.pending_fishing_started or GetTime();
+        self.pending_fishing_started = nil;
     end
     -- we get invoked when items get equipped as well
     FL:UpdateLureInventory();
 end
 
 function FBI:ExitFishingMode(logout)
+    self.watcher_fishing_pending = nil;
+    self.pending_fishing_started = nil;
+    self.pending_fishing_loot = nil;
     if ( FBI.StartedFishing ) then
         if ( not logout ) then
             self:WatchUpdate();
@@ -1728,6 +1781,7 @@ local IsZoning;
 -- Track when we last caught something for delayed loot detection
 local lastFishingTime = 0
 local FISHING_LOOT_TIMEOUT = 3.0  -- seconds to consider loot as fishing-related after fishing ends
+local FIRST_FISHING_LOOT_TIMEOUT = 45.0
 
 -- Modern WoW removed IsFishingLoot() global function
 -- Loot only counts as fish when the fishing channel itself just ran. Fishing mode can
@@ -1735,10 +1789,17 @@ local FISHING_LOOT_TIMEOUT = 3.0  -- seconds to consider loot as fishing-related
 -- so neither the mode nor an equipped pole may qualify loot on their own.
 local function IsFishingLoot()
     -- The fishing channel ran moments ago (looting the bobber always ends the channel)
-    local lastcast = GetLastCastTime()
+    local lastcast = GetLastCastTime() or FL.lastCastTime;
     if lastcast and (GetTime() - lastcast) < FISHING_LOOT_TIMEOUT then
         lastFishingTime = GetTime()
         return true
+    end
+
+    local pendingLoot = FBI.pending_fishing_loot;
+    if pendingLoot and (GetTime() - pendingLoot) < FIRST_FISHING_LOOT_TIMEOUT then
+        FBI.pending_fishing_loot = nil;
+        lastFishingTime = GetTime();
+        return true;
     end
 
     -- Also check if we were fishing recently (handles delayed loot windows)

@@ -1311,17 +1311,23 @@ function FishLib:GetItemPattern()
 end
 
 function FishLib:ValidLink(link, full)
-    if type(link) ~= "string" or string.match(link, "^%d+") then
+    if type(link) ~= "string" and type(link) ~= "number" then
+        return nil;
+    end
+    if type(link) == "number" or string.match(link, "^%d+") then
         link = "item:"..link
     end
     if full then
-        link = self:GetItemInfoFields(link, self.ITEM_LINK);
+        link = self:GetItemInfoFields(link, self.ITEM_LINK) or link;
     end
     return link
 end
 
 function FishLib:SetHyperlink(tooltip, link, uncleared)
     link = self:ValidLink(link, true);
+    if (not link) then
+        return;
+    end
     if (not uncleared) then
         tooltip:ClearLines();
     end

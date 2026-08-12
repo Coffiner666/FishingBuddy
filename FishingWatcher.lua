@@ -602,7 +602,7 @@ WatchEvents["VARIABLES_LOADED"] = function()
 end
 
 local function ShowWatcher()
-    if GSB("WatchFishies") and (not GSB("WatchOnlyWhenFishing") or FBI:AreWeFishing()) then
+    if GSB("WatchFishies") and (not GSB("WatchOnlyWhenFishing") or FBI:AreWeFishing() or FBI.watcher_fishing_pending) then
         if ( not FishingWatchFrame:IsShown() ) then
             FishingWatchFrame:Show();
         end
@@ -618,6 +618,11 @@ local function StartWatching()
     TotalTimeFishing = FBI:GetSetting("TotalTimeFishing");
     ZoneFishingTime = 0;
     FBI:WatchUpdate();
+end
+
+function FBI:ShowFishingWatcher()
+    FBI.watcher_fishing_pending = true;
+    StartWatching();
 end
 
 WatchEvents[FBConstants.OPT_UPDATE_EVT] = function(changed)
@@ -714,7 +719,7 @@ end
 -- Fish watcher functions
 local function UpdateTimerLine()
     if ( ShowWatcher() and GSB("WatchElapsedTime") ) then
-        local StartedFishing = FBI.StartedFishing;
+        local StartedFishing = FBI.StartedFishing or FBI.pending_fishing_started;
         if ( StartedFishing ) then
             if ( not TotalTimeFishing ) then
                 StartWatching();
