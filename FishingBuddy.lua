@@ -1100,7 +1100,9 @@ end
 
 local function CheckCastingKeys()
     if not FL:IsClassic() then
-        return CastingKeys() or FBI:ActiveSetting("KeepOnTruckin") or FBI:ReadyForFishing();
+        -- Require the configured modifier to start Easy Cast, but allow
+        -- follow-up casts without modifiers while we're already fishing.
+        return CastingKeys() or FBI:ActiveSetting("KeepOnTruckin");
     else
         return FBI:ReadyForFishing();
     end
@@ -1364,7 +1366,8 @@ CaptureEvents["UNIT_SPELLCAST_INTERRUPTED"] = function(unit, lineid, spellid)
         return;
     end
     if IsFishingCast(current_spell_id) then
-        SetLastCastTime();
+        easyCastAwaitingConfirmation = false;
+        FishingModeFrame:EmitStopFishing();
     end
     current_spell_id = nil
     ClearLastLure()

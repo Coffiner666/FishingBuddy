@@ -1,6 +1,7 @@
 ## Interface: 120007, 120100
 ## Title: Fishing Buddy
-## Version: 1.26.11
+## Version: 1.26.12
+## IconTexture: Interface\AddOns\FishingBuddy\Icons\Fishing-Icon
 ## X-Curse-Project-ID: 15093
 ## X-WoWI-ID: 4239
 ## Notes: Help with fishing related tasks -- clothing, fish information, etc.

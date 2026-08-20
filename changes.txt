@@ -1,3 +1,9 @@
+Version 1.26.12
+- Restore Easy Cast start gating so the configured modifier key (Alt/Shift/Ctrl) is required to begin double-click casting on Retail; KeepOnTruckin still allows follow-up casts while actively fishing.
+- Fix watcher linger after stopping an interrupted fishing cast by ending fishing mode immediately instead of refreshing the idle timer.
+- Harden pool detection against Retail secret-string taint in LibFishing IsFishingPool() by guarding lowercasing during pool-name matching.
+- Set the AddOns/Addon Compartment list icon via TOC metadata (`## IconTexture`) so Fishing Buddy no longer shows the default question-mark icon there.
+
 Version 1.26.11
 - Fix Retail tooltip errors when item data has not yet been cached: item IDs now retain a valid `item:<id>` fallback instead of passing nil to C_TooltipInfo.
 - Prevent Fishing Buddy's movement watchdog from reading secret player aura data during combat lockdown.

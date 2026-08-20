@@ -1476,10 +1476,13 @@ function FishLib:IsFishingPool(text)
         text = self:GetTooltipText();
     end
     if ( text ) then
-        local check = string.lower(text);
+        local ok, check = pcall(string.lower, text);
+        if ( not ok or not check ) then
+            return nil;
+        end
         for _,info in pairs(self.SCHOOLS) do
-            local name = string.lower(info.name);
-            if ( string.find(check, name) ) then
+            local okName, name = pcall(string.lower, info.name);
+            if ( okName and name and string.find(check, name) ) then
                 return info;
             end
         end
