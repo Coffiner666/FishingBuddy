@@ -7,7 +7,18 @@
 	</Size>
     </FontString>
 
-    <Frame name="FishingWatchFrame" frameStrata="LOW" toplevel="true" enableMouse="false" clampedToScreen="true" movable="true" parent="UIParent" hidden="true">
+    <Frame name="FishingWatchFrame" inherits="BackdropTemplate" frameStrata="LOW" toplevel="true" enableMouse="false" clampedToScreen="true" movable="true" parent="UIParent" hidden="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="FishingWatchHeader" inherits="FishingWatchFontTemplate" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="FishingWatchFrame" relativePoint="TOPLEFT">
+							<AbsDimension x="10" y="-10"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
 		<Scripts>
 			<OnLoad>
 				FBEnvironment.Watcher_OnLoad(self);
@@ -39,11 +50,11 @@
 					<AbsDimension x="280" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="FishingWatchTab" relativePoint="BOTTOMLEFT">
-						<AbsDimension x="0" y="-2"/>
+					<Anchor point="TOPLEFT" relativeTo="FishingWatchHeader" relativePoint="BOTTOMLEFT">
+						<AbsDimension x="0" y="-10"/>
 					</Anchor>
 					<Anchor point="BOTTOMRIGHT" relativeTo="FishingWatchFrame" relativePoint="BOTTOMRIGHT">
-						<AbsDimension x="0" y="-2"/>
+						<AbsDimension x="-10" y="10"/>
 					</Anchor>
 				</Anchors>
 				<Layers>

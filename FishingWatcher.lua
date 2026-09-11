@@ -10,6 +10,8 @@ local GSB = function(...) return FBI:GetSettingBool(...); end;
 
 local MAX_FISHINGWATCH_LINES = 1;
 local WATCHDRAGGER_SHOW_DELAY = 0.5;
+local WATCHER_PADDING = 10;
+local WATCHER_HEADER_GAP = 10;
 
 local ELAPSEDTIME_LINE = 1;
 local WATCHDRAGGER_FADE_TIME = 0.25;
@@ -229,25 +231,18 @@ end
 
 -- handle special frame actions
 local function FadingFinished()
-    FishingWatchHighlight:Hide();
     FishingWatchTab:Hide();
     FishingWatchTab.finishedFunc = nil;
 end
 
 local function ShowDraggerFrame()
-    UIFrameFadeIn(FishingWatchHighlight, WATCHDRAGGER_FADE_TIME, 0, 0.15);
-    UIFrameFadeIn(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 0, 1.0);
     FishingWatchFrame:EnableMouse(true);
 end
 
 local function HideDraggerFrame()
     LW.OnDragStop(FishingWatchFrame);
     FishingWatchFrame:EnableMouse(false);
-    if (FishingWatchTab:IsShown()) then
-        FishingWatchTab.finishedFunc = FadingFinished;
-        UIFrameFadeOut(FishingWatchHighlight, WATCHDRAGGER_FADE_TIME, 0.15, 0);
-        UIFrameFadeOut(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 1.0, 0);
-    end
+    FishingWatchTab:Hide();
 end
 
 function FBI:ResetWatcherFrame(update)
@@ -565,6 +560,7 @@ end
 WatchEvents["VARIABLES_LOADED"] = function()
     ZoneFishingTime = 0;
 
+    FishingWatchHeader:SetText(FBConstants.NAME);
     FishingWatchTab.Text:SetText(FBConstants.NAME);
     PanelTemplates_TabResize(FishingWatchTab, 10);
 
@@ -896,8 +892,15 @@ function FWF:WatchUpdate()
         line:Hide();
     end
 
-    FishingWatchFrame:SetHeight((self.current_line - 1) * 13 + FishingWatchTab:GetHeight());
-    FishingWatchFrame:SetWidth(self.fishingWatchMaxWidth + 10);
+    local lineCount = self.current_line - 1;
+    local lineHeight = FishingWatchLine1:GetHeight();
+    local headerHeight = FishingWatchHeader:GetStringHeight();
+
+    local frameHeight = math.ceil((lineCount * lineHeight) + headerHeight + WATCHER_HEADER_GAP + (WATCHER_PADDING * 2));
+    local frameWidth = math.ceil(self.fishingWatchMaxWidth + (WATCHER_PADDING * 2));
+
+    FishingWatchFrame:SetHeight(frameHeight);
+    FishingWatchFrame:SetWidth(frameWidth);
 end
 
 function FBI:WatchUpdate()
@@ -920,6 +923,13 @@ end
 local WatWin = {}
 function FBEnvironment.Watcher_OnLoad(self)
     local _, _, _, classic = FL:WOWVersion();
+    self:SetBackdrop({
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 },
+    });
+    self:SetBackdropBorderColor(1.0, 0.82, 0.0, 0.9);
+
     timerframe = CreateFrame("FRAME");
     timerframe:Hide();
     timerframe:SetScript("OnUpdate", TimerUpdate);

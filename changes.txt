@@ -1,3 +1,9 @@
+Version 1.27
+- Refresh the Fish Watcher visual layout with a dedicated header label that uses the addon name text.
+- Remove the hover-only drag overlay/tab visual so the watcher no longer shows duplicate hover text.
+- Add a thin gold border around the Fish Watcher and standardize border rendering using a BackdropTemplate 1px edge.
+- Rework Fish Watcher spacing to consistent 10px inner padding for cleaner margins around header and content.
+
 Version 1.26.12
 - Restore Easy Cast start gating so the configured modifier key (Alt/Shift/Ctrl) is required to begin double-click casting on Retail; KeepOnTruckin still allows follow-up casts while actively fishing.
 - Fix watcher linger after stopping an interrupted fishing cast by ending fishing mode immediately instead of refreshing the idle timer.
