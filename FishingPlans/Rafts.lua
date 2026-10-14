@@ -20,6 +20,18 @@ local RAFT_ID = 85500;
 local BERG_ID = 107950;
 local BOARD_ID = 166461;
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
+local PlayerHasToyFn = _G.PlayerHasToy;
+if ( not PlayerHasToyFn ) then
+    PlayerHasToyFn = function()
+        return false;
+    end;
+end
+
 local RaftItems = FBI.RaftItems;
 
 -- have to check this because C_ToyBox.IsToyUsable(RAFT_ID) also
@@ -30,15 +42,15 @@ local function HasPandarianFishing()
 end
 
 local function HaveRaft()
-    return PlayerHasToy(RAFT_ID) and HasPandarianFishing();
+    return PlayerHasToyFn and PlayerHasToyFn(RAFT_ID) and HasPandarianFishing();
 end
 
 local function HaveWaveboard()
-    return PlayerHasToy(BOARD_ID);
+    return PlayerHasToyFn and PlayerHasToyFn(BOARD_ID);
 end
 
 local function HaveBerg()
-    return GetItemCount(BERG_ID) > 0;
+    return GetItemCountFn and GetItemCountFn(BERG_ID) > 0;
 end
 
 function FBI:HaveRafts()
@@ -158,10 +170,10 @@ FBI.Commands["raft"].func =
                 ["119700"] = FL:HasBuff(119700),
             },
             ["SurfaceTension"] = GSB("OverWalking"),
-            ["HaveRaft"] = PlayerHasToy(RAFT_ID),
+            ["HaveRaft"] = PlayerHasToyFn and PlayerHasToyFn(RAFT_ID),
             ["UseableRaft"] = C_ToyBox.IsToyUsable(RAFT_ID),
             ["RaftInfo"] = C_ToyBox.GetToyInfo(RAFT_ID),
-            ["BergCount"] = GetItemCount(BERG_ID),
+            ["BergCount"] = GetItemCountFn and GetItemCountFn(BERG_ID),
             ["Maintain"] = GSB("BergMaintainOnly"),
             ["UseBerg"] = GSB("UseBobbingBerg"),
             ["PandarenSkill"] = skill

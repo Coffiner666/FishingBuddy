@@ -1069,7 +1069,7 @@ end)
 
 -- handle option keys for enabling casting
 local key_actions = {
-    [FBConstants.KEYS_NONE] = function(mouse) return mouse ~= FL:GetSAMouseEvent(); end,
+    [FBConstants.KEYS_NONE] = function(mouse) return true; end,
     [FBConstants.KEYS_SHIFT] = function(mouse) return IsShiftKeyDown(); end,
     [FBConstants.KEYS_CTRL] = function(mouse) return IsControlKeyDown(); end,
     [FBConstants.KEYS_ALT] = function(mouse) return IsAltKeyDown(); end,
@@ -1333,7 +1333,20 @@ local current_spell_id = nil
 -- The channel events report the castable Fishing spell (131474, fishing_buff),
 -- not the profession spell id kept in fishing_spellid
 local function IsFishingCast(spellid)
-    return spellid and (spellid == fishing_buff or spellid == fishing_spellid);
+    if ( spellid and (spellid == fishing_buff or spellid == fishing_spellid) ) then
+        return true;
+    end
+
+    local channelName, _, _, _, _, _, _, _, _, channelSpellID = UnitChannelInfo("player");
+    if ( channelSpellID and (channelSpellID == fishing_buff or channelSpellID == fishing_spellid) ) then
+        return true;
+    end
+
+    if ( channelName and channelName == PROFESSIONS_FISHING ) then
+        return true;
+    end
+
+    return false;
 end
 
 CaptureEvents["UNIT_SPELLCAST_CHANNEL_START"] = function(unit, lineid, spellid)

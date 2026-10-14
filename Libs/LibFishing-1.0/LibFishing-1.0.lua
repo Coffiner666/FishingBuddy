@@ -170,6 +170,11 @@ FishLib.ITEM_STACK = 8
 FishLib.ITEM_EQUIPLOC = 9
 FishLib.ITEM_ICON = 10
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
 function FishLib:GetFishingProfession()
     local fishing;
     if self:IsClassic() then
@@ -654,7 +659,7 @@ function FishLib:UpdateLureInventory()
     local b = 0;
     for _,lure in ipairs(FISHINGLURES) do
         local id = lure.id;
-        local count = GetItemCount(id);
+        local count = GetItemCountFn and GetItemCountFn(id) or 0;
         -- does this lure have to be "worn"
         if ( count > 0 ) then
             local startTime, _, _ = C_Container.GetItemCooldown(id);
@@ -868,7 +873,7 @@ end
 function FishLib:FindBestHat()
     for _,hat in ipairs(FISHINGHATS) do
         local id = hat["id"]
-        if GetItemCount(id) > 0 and self:IsWorn(id) then
+        if (GetItemCountFn and GetItemCountFn(id) > 0) and self:IsWorn(id) then
             local startTime, _, _ = C_Container.GetItemCooldown(id);
             if ( startTime == 0 ) then
                 return 1, hat;
@@ -1386,7 +1391,14 @@ function FishLib:GetItemInfoFields(link, ...)
 -- subtype, stackcount, equiploc, texture
     if (link) then
         link = self:ValidLink(link)
-        local iteminfo = {GetItemInfo(link)}
+        local getItemInfo = _G.GetItemInfo;
+        if ( not getItemInfo and C_Item and C_Item.GetItemInfo ) then
+            getItemInfo = C_Item.GetItemInfo;
+        end
+        if ( not getItemInfo ) then
+            return;
+        end
+        local iteminfo = {getItemInfo(link)}
         local results = {}
         for idx = 1, select('#', ...) do
             local sel_idx = select(idx, ...)

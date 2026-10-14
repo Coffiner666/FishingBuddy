@@ -14,6 +14,11 @@ local _
 
 local CurLoc = GetLocale();
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
 -- wrap settings
 local FBGetSetting = function(...) return FBI:GetSetting(...); end;
 local FBGetSettingBool = function(...) return FBI:GetSettingBool(...); end;
@@ -91,7 +96,7 @@ local objectiveMapID =  {
 
 function FBI:IsQuestFishing(item)
     -- Check for hookshot
-    if (GetItemCount(116755) > 0) then
+    if (GetItemCountFn and GetItemCountFn(116755) > 0) then
         -- Better Nat's quest checking by Bodar (Curse)
         local questLogIndex = C_QuestLog.GetLogIndexForQuestID(36611);
         if (questLogIndex > 0) then
@@ -108,7 +113,7 @@ function FBI:IsQuestFishing(item)
 
     -- and intro quest baits
     for _,bait in ipairs(QuestBaits) do
-        if (GetItemCount(bait.item) > 0 or FL:HasBuff(bait.spell)) then
+        if ((GetItemCountFn and GetItemCountFn(bait.item) > 0) or FL:HasBuff(bait.spell)) then
             return true;
         end
     end
@@ -302,7 +307,7 @@ function FBI:CastAndThrow()
         -- Only do this is we're using the Underlight Angler
         if FL:GetMainHandItem(true) == FBConstants.UNDERLIGHT_ANGLER then
             for id,info in pairs(LevelingItems) do
-                if GetItemCount(id) > 0 then
+                if GetItemCountFn and GetItemCountFn(id) > 0 then
                     local rank, _, skillmax, _ = FL:GetCurrentSkill();
                     local _, _, _, _, _, levels, _, _, _, _, _, _ = C_ArtifactUI.GetArtifactInfo()
                     local isAP = not info.skill;

@@ -20,6 +20,11 @@ local ZoneFishingTime = 0;
 local TotalTimeFishing = nil;
 local CurLoc = GetLocale();
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
 local FL = LibStub("LibFishing-1.0");
 local LW = LibStub("LibWindow-1.1");
 
@@ -198,7 +203,7 @@ function FWF:DisplayFishLine(fish, label, area)
     local current_area, subzone = FBI:GetCurrentMapIdInfo();
     area = area or current_area
     for id,info in pairs(fish) do
-        local havesome = GetItemCount(id);
+        local havesome = GetItemCountFn and GetItemCountFn(id) or 0;
         local here;
         if info.area then
             here = info.area == area;

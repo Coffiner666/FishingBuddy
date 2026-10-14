@@ -1,3 +1,11 @@
+Version 1.27.1
+- Fix Retail nil-call in FishingDatabase when resolving quest item class text by falling back from global GetItemClassInfo to C_Item.GetItemClassInfo.
+- Fix Retail nil-call in LibFishing GetItemInfoFields by falling back from global GetItemInfo to C_Item.GetItemInfo.
+- Fix Retail nil-call in FishingPlans/Rafts when checking Bipsi's Bobbing Berg counts by falling back from global GetItemCount to C_Item.GetItemCount.
+- Fix additional Retail nil-calls from direct GetItemCount usage in FishingPlans, FishingPlans/Items, FishingPlans/Coins, FishingFluff, FishingWatcher, and LibFishing lure/hat inventory scans by using C_Item.GetItemCount fallback helpers.
+- Fix Easy Cast start gating when no modifier key is configured: the KEYS_NONE path now allows cast start instead of blocking double-click casting.
+- Improve fishing cast detection resilience by falling back to UnitChannelInfo spell/name checks when channel event spell IDs are missing or drift, restoring fish-mode transitions and watcher activation.
+
 Version 1.27
 - Refresh the Fish Watcher visual layout with a dedicated header label that uses the addon name text.
 - Remove the hover-only drag overlay/tab visual so the watcher no longer shows duplicate hover text.

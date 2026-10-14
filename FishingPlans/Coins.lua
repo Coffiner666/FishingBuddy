@@ -14,6 +14,11 @@ local PLANS = FBI.FishingPlans
 
 local CurLoc = GetLocale();
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
 -- Dalaran coin lures
 local CoinLures = {};
 CoinLures[138956] = {
@@ -59,7 +64,7 @@ local function CoinPlan()
             if (FL:HasBuff(info.spell)) then
                 return
             end
-            if (GetItemCount(id) > 0) then
+            if (GetItemCountFn and GetItemCountFn(id) > 0) then
                 lure_id = id
                 lure_info = info
             end

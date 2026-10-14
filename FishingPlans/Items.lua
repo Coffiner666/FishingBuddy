@@ -15,6 +15,11 @@ local PLANS = FBI.FishingPlans
 
 local CurLoc = GetLocale();
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
 local TUSKARR_ID = 88535;
 local TuskarrItem = {
     ["enUS"] = "Sharpened Tuskarr Spear",
@@ -59,7 +64,7 @@ local function TuskarrPlan()
     end
 
     -- We're not actually carrying a spear with us...
-    if GetItemCount(TuskarrItem.id) == 0 then
+    if ( not GetItemCountFn or GetItemCountFn(TuskarrItem.id) == 0 ) then
         return
     end
     local main = FL:GetMainHandItem(true);
@@ -114,7 +119,7 @@ local LagerItem =  {
 -- and leave that for FishingAce!
 local function LagerPlan()
     if GSB("FishingFluff") and GSB("DrinkHeavily") then
-        if (GetItemCount(LagerItem.id) > 0 and not FL:HasBuff(LagerItem.spell)) then
+        if (GetItemCountFn and GetItemCountFn(LagerItem.id) > 0 and not FL:HasBuff(LagerItem.spell)) then
             PLANS:AddEntry(LagerItem.id, LagerItem[CurLoc])
             FL:WaitForBuff(LagerItem.spell)
         end

@@ -14,13 +14,30 @@ local FL = LibStub("LibFishing-1.0");
 local GSB = function(...) return FBI:GetSettingBool(...); end;
 local CurLoc = GetLocale();
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
+
+local PlayerHasToyFn = _G.PlayerHasToy;
+if ( not PlayerHasToyFn ) then
+    PlayerHasToyFn = function()
+        return false;
+    end;
+end
+
+local GetItemInfoFn = _G.GetItemInfo;
+if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
+    GetItemInfoFn = C_Item.GetItemInfo;
+end
+
 local FishingPlans = {}
 
 function FishingPlans:HaveThing(itemid, info)
     if (info.toy) then
-        return PlayerHasToy(itemid) and C_ToyBox.IsToyUsable(itemid)
+        return PlayerHasToyFn(itemid) and C_ToyBox.IsToyUsable(itemid)
     else
-        return GetItemCount(itemid) > 0;
+        return GetItemCountFn and GetItemCountFn(itemid) > 0;
     end
 end
 
@@ -43,7 +60,7 @@ function FishingPlans:CanUseFishingItem(id, info)
     if not info.setting or GSB(info.setting) then
         if self:HaveThing(id, info) and (not info.usable or info.usable(info) ) then
             if (not info[CurLoc]) then
-                info[CurLoc] = GetItemInfo(id);
+                info[CurLoc] = GetItemInfoFn and GetItemInfoFn(id);
             end
             if not (self:AlreadyUsedFishingItem(id, info) or self:ItemCooldownOn(id, info)) then
                 return true;

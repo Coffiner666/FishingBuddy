@@ -295,7 +295,12 @@ function FBI:IsCountedFish(id)
 	return true;
 end
 
-local questType = _G.GetItemClassInfo(Enum.ItemClass.Questitem);
+local questClassInfo = _G.GetItemClassInfo;
+if ( not questClassInfo and C_Item and C_Item.GetItemClassInfo ) then
+	questClassInfo = C_Item.GetItemClassInfo;
+end
+local questClass = Enum and Enum.ItemClass and (Enum.ItemClass.Questitem or Enum.ItemClass.QuestItem);
+local questType = questClass and questClassInfo and questClassInfo(questClass);
 local CurLoc = GetLocale();
 function FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quality, level, it, st, poolhint)
 	local GSB = function(...) return FBI:GetSettingBool(...); end;
