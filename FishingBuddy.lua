@@ -1069,7 +1069,7 @@ end)
 
 -- handle option keys for enabling casting
 local key_actions = {
-    [FBConstants.KEYS_NONE] = function(mouse) return true; end,
+    [FBConstants.KEYS_NONE] = function(mouse) return mouse ~= FL:GetSAMouseEvent(); end,
     [FBConstants.KEYS_SHIFT] = function(mouse) return IsShiftKeyDown(); end,
     [FBConstants.KEYS_CTRL] = function(mouse) return IsControlKeyDown(); end,
     [FBConstants.KEYS_ALT] = function(mouse) return IsAltKeyDown(); end,
@@ -1200,10 +1200,14 @@ local function HideAwayAll(self, button, down)
 end
 
 local function GetFishingItem(itemtable)
+    local GetItemInfoFn = _G.GetItemInfo;
+    if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
+        GetItemInfoFn = C_Item.GetItemInfo;
+    end
     for itemid, info in pairs(itemtable) do
         if ( info.always or (PLANS:HaveThing(itemid, info) and (not info.setting or FBI:GetSettingBool(info.setting))) ) then
             if (not info[CurLoc]) then
-                info[CurLoc] = GetItemInfo(itemid);
+                info[CurLoc] = GetItemInfoFn and GetItemInfoFn(itemid) or info.enUS;
             end
             if PLANS:CanUseFishingItem(itemid, info) then
                 local doit = true;

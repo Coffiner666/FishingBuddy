@@ -13,6 +13,18 @@ local FL = LibStub("LibFishing-1.0");
 local CurLoc = GetLocale();
 local PLANS = FBI.FishingPlans;
 
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+	GetItemCountFn = C_Item.GetItemCount;
+end
+
+local PlayerHasToyFn = _G.PlayerHasToy;
+if ( not PlayerHasToyFn ) then
+	PlayerHasToyFn = function()
+		return false;
+	end;
+end
+
 local BOBBER_NONE = -1;
 local BOBBER_ALL = -2;
 local BOBBER_OVERSIZE = -3;
@@ -128,7 +140,7 @@ end
 local function PickRandomBobber(bobbersetting)
 	local baits = {};
 	for _,id in ipairs(bobbersetting) do
-		if (PlayerHasToy(id) and C_ToyBox.IsToyUsable(id)) then
+		if (PlayerHasToyFn(id) and C_ToyBox.IsToyUsable(id)) then
 			if not PLANS:ItemCooldownOn(id) then
 				id = C_ToyBox.GetToyInfo(id);
 				tinsert(baits, id);
@@ -146,7 +158,7 @@ local function UseThisBobber(itemid, info)
     local itemtype;
     if (info.toy) then
         canuse = false
-		if (PlayerHasToy(itemid) and C_ToyBox.IsToyUsable(itemid)) then
+		if (PlayerHasToyFn(itemid) and C_ToyBox.IsToyUsable(itemid)) then
 			if not PLANS:ItemCooldownOn(itemid) then
                 itemid = C_ToyBox.GetToyInfo(itemid);
                 canuse = true
@@ -154,7 +166,7 @@ local function UseThisBobber(itemid, info)
             end
         end
     else
-        canuse = (GetItemCount(itemid) > 0)
+		canuse = (GetItemCountFn and GetItemCountFn(itemid) > 0)
 	end
     if (canuse and not FL:HasBuff(info.spell)) then
         return itemid, canuse, itemtype
@@ -270,7 +282,7 @@ if ( FBI.Debugging ) then
 		function()
 			local baits = {};
 			for _,id in ipairs(bobberkeys) do
-				if (PlayerHasToy(id) and C_ToyBox.IsToyUsable(id)) then
+				if (PlayerHasToyFn(id) and C_ToyBox.IsToyUsable(id)) then
 					if not PLANS:ItemCooldownOn(id) then
 						id = C_ToyBox.GetToyInfo(id);
 						tinsert(baits, id);

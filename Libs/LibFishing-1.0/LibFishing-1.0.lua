@@ -2568,9 +2568,15 @@ function FishLib:GetBestFishingItem(slotid, ignore)
     itemtable = GetInventoryItemsForSlot(slotid, itemtable);
     for location,id in pairs(itemtable) do
         if (not ignore or not ignore[id]) then
-            local player, bank, bags, void, slot, bag = EquipmentManager_UnpackLocation(location);
-            if ( bags and slot and bag ) then
-                link = C_Container.GetContainerItemLink(bag, slot);
+            if ( type(id) == "string" ) then
+                link = id;
+            elseif ( EquipmentManager_UnpackLocation ) then
+                local player, bank, bags, void, slot, bag = EquipmentManager_UnpackLocation(location);
+                if ( bags and slot and bag ) then
+                    link = C_Container.GetContainerItemLink(bag, slot);
+                else
+                    link = nil;
+                end
             else
                 link = nil;
             end

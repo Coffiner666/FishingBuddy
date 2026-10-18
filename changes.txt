@@ -1,3 +1,9 @@
+Version 1.27.2
+- Fix Retail nil-call in FishingDatabase AddFishie color handling by using a safe quality-color fallback chain (GetItemQualityColor -> C_Item.GetItemQualityColor -> ITEM_QUALITY_COLORS).
+- Fix Retail nil-call in LibFishing GetBestFishingItem when EquipmentManager_UnpackLocation is unavailable; prefer direct links returned by GetInventoryItemsForSlot and guard legacy unpack calls.
+- Fix Retail nil-call in FishingPlans/Bobbers by replacing direct GetItemCount and PlayerHasToy calls with compatibility-safe wrappers.
+- Fix Retail nil-call in FishingBuddy GetFishingItem during follow-up Easy Cast checks by resolving item names via a safe GetItemInfo fallback (global or C_Item) with localized-name fallback.
+
 Version 1.27.1
 - Fix Retail nil-call in FishingDatabase when resolving quest item class text by falling back from global GetItemClassInfo to C_Item.GetItemClassInfo.
 - Fix Retail nil-call in LibFishing GetItemInfoFields by falling back from global GetItemInfo to C_Item.GetItemInfo.

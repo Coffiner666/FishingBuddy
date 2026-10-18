@@ -301,6 +301,27 @@ if ( not questClassInfo and C_Item and C_Item.GetItemClassInfo ) then
 end
 local questClass = Enum and Enum.ItemClass and (Enum.ItemClass.Questitem or Enum.ItemClass.QuestItem);
 local questType = questClass and questClassInfo and questClassInfo(questClass);
+
+local function GetQualityColorHex(quality)
+	local q = tonumber(quality) or 1;
+	if ( _G.GetItemQualityColor ) then
+		local _, _, _, hex = _G.GetItemQualityColor(q);
+		if ( hex ) then
+			return hex;
+		end
+	end
+	if ( C_Item and C_Item.GetItemQualityColor ) then
+		local color = C_Item.GetItemQualityColor(q);
+		if ( color and color.GenerateHexColor ) then
+			return "|c"..color:GenerateHexColor();
+		end
+	end
+	if ( ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[q] and ITEM_QUALITY_COLORS[q].hex ) then
+		return "|c"..ITEM_QUALITY_COLORS[q].hex;
+	end
+	return "|cffffffff";
+end
+
 local CurLoc = GetLocale();
 function FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quality, level, it, st, poolhint)
 	local GSB = function(...) return FBI:GetSettingBool(...); end;
@@ -311,8 +332,11 @@ function FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quali
 	
 	if ( id and not FishingBuddy_Info["Fishies"][id] ) then
 		if ( not color ) then
-			local _,_,_,hex = GetItemQualityColor(quality);
+			local hex = GetQualityColorHex(quality);
 			_,_,color = string.find(hex, "|c(%a+)");
+			if ( not color ) then
+				color = "ffffffff";
+			end
 		end
 		FishingBuddy_Info["Fishies"][id] = { };
 		FishingBuddy_Info["Fishies"][id][CurLoc] = name;
