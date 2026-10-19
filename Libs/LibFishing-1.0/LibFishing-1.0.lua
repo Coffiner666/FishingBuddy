@@ -10,7 +10,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 local _
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 101111
+local MINOR_VERSION = 101112
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -700,11 +700,9 @@ local spellidx = nil;
 function FishLib:GetBuff(buffId)
     if ( buffId ) then
         for idx=1,40 do
-            local current_buff = C_UnitAuras.GetAuraDataByIndex("player", idx);
-            if current_buff then
-                local info = {C_UnitAuras.GetAuraDataByIndex("player", idx)};
-                local spellid = select(10, unpack(info));
-                if (buffId == spellid) then
+            local info = C_UnitAuras.GetAuraDataByIndex("player", idx);
+            if info then
+                if (buffId == info.spellId) then
                     return idx, info
                 end
             else
@@ -723,8 +721,7 @@ function FishLib:HasBuff(buffId, skipWait)
         else
             local idx, info = self:GetBuff(buffId);
             if idx then
-                local et = select(6, unpack(info));
-                return true, et;
+                return true, info.expirationTime;
             end
         end
     end
@@ -758,6 +755,14 @@ function FishLib:FishingForAttention()
 end
 
 function FishLib:HasLureBuff()
+    -- Most pole lures apply as a temporary weapon enchant on the pole, not a
+    -- unit aura, so GetPoleBonus (which reads GetWeaponEnchantInfo) is the
+    -- correct check for those. Fall back to the unit-aura check for any lure
+    -- that does apply as a real buff.
+    local _, tempenchant = self:GetPoleBonus();
+    if (tempenchant and tempenchant ~= 0) then
+        return true;
+    end
     for _,lure in ipairs(FISHINGLURES) do
         if self:HasBuff(lure.spell) then
             return true
@@ -2510,7 +2515,16 @@ function FishLib:GetPoleBonus()
         local poleslot = IsRetail() and INVSLOT_FISHING_TOOL or INVSLOT_MAINHAND;
         -- get the total bonus for the pole
         local total = self:FishingBonusPoints(poleslot, true);
-        local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
+        -- GetWeaponEnchantInfo only ever reports main-hand/off-hand/ranged (and is
+        -- deprecated as of 12.1.0), so it can never see a lure on the fishing tool
+        -- slot. C_PaperDollInfo.GetTemporaryEnchantmentInfo takes the actual slot,
+        -- so prefer it when available and fall back for non-Retail.
+        local hmhe;
+        if (C_PaperDollInfo and C_PaperDollInfo.GetTemporaryEnchantmentInfo) then
+            hmhe = C_PaperDollInfo.GetTemporaryEnchantmentInfo(poleslot) ~= nil
+        else
+            hmhe = GetWeaponEnchantInfo();
+        end
         if ( hmhe ) then
             local id;
             -- IsFishingPole has set mainhand for us
