@@ -311,9 +311,9 @@ local function GetQualityColorHex(quality)
 		end
 	end
 	if ( C_Item and C_Item.GetItemQualityColor ) then
-		local color = C_Item.GetItemQualityColor(q);
-		if ( color and color.GenerateHexColor ) then
-			return "|c"..color:GenerateHexColor();
+		local _, _, _, hex = C_Item.GetItemQualityColor(q);
+		if hex then
+			return "|c"..hex;
 		end
 	end
 	if ( ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[q] and ITEM_QUALITY_COLORS[q].hex ) then
@@ -333,7 +333,7 @@ function FBI:AddFishie(color, id, name, mapId, subzone, texture, quantity, quali
 	if ( id and not FishingBuddy_Info["Fishies"][id] ) then
 		if ( not color ) then
 			local hex = GetQualityColorHex(quality);
-			_,_,color = string.find(hex, "|c(%a+)");
+			_,_,color = string.find(hex, "|c(%x+)");
 			if ( not color ) then
 				color = "ffffffff";
 			end
