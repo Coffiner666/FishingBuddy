@@ -42,14 +42,32 @@ local FluffEvents = {};
 local unTrack = nil;
 local resetPVP = nil;
 
+-- Enabling tracking casts a spell (Find Fish), which interrupts an in-progress
+-- fishing channel just like the pet summon does. Wait for the channel to clear.
+local function EnableTrackingWhenSafe(findid, tries)
+    if (UnitChannelInfo("player") or UnitCastingInfo("player")) then
+        if (tries > 0) then
+            C_Timer.After(3.0, function() EnableTrackingWhenSafe(findid, tries - 1) end)
+        end
+        return
+    end
+    unTrack = true;
+    C_Minimap.SetTracking(findid, true);
+    -- NOTE: the minimap tracking dropdown's checkmark can stay unticked after
+    -- this, even though tracking is genuinely on. Blizzard's own dropdown keeps
+    -- a separate "predicted" state (see Minimap.lua's CreatePredictedTrackingState)
+    -- that only resyncs from C_Minimap.GetTrackingInfo on CVAR_UPDATE/VARIABLES_LOADED/
+    -- SPELLS_CHANGED while the dropdown is closed. A SetTracking call from outside
+    -- that dropdown doesn't update it.
+end
+
 function FBI:FishTrackingEnable(enabled)
     local findid = FL:GetFindFishID();
     if ( findid ) then
         if enabled then
-            local _, _, active, _ = C_Minimap.GetTrackingInfo(findid);
+            local active = C_Minimap.GetTrackingInfo(findid).active;
             if (not active) then
-                unTrack = true;
-                C_Minimap.SetTracking(findid, true);
+                C_Timer.After(2.0, function() EnableTrackingWhenSafe(findid, 10) end);
             end
         elseif unTrack then
             unTrack = false;
