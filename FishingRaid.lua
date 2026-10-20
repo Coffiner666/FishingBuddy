@@ -510,6 +510,11 @@ local function FishingAction_OnShow(self)
     UIParent_ManageFramePositions();
 end
 
+local GetItemInfoFn = _G.GetItemInfo
+if not GetItemInfoFn and C_Item and C_Item.GetItemInfo then
+    GetItemInfoFn = C_Item.GetItemInfo
+end
+
 -- Thanks bsmorgan!
 local minRarity = 2;		-- uncommon
 local function SilenceOfTheFishies(self, _, msg, author, ...)
@@ -517,8 +522,8 @@ local function SilenceOfTheFishies(self, _, msg, author, ...)
 		return false, msg, author, ...
 	else
 		local itemID = select(3, string.find(msg, "item:(%d+):"))
-		local itemRarity = select(3, GetItemInfo(itemID))
-		if (itemRarity < minRarity) then
+		local itemRarity = itemID and select(3, GetItemInfoFn(itemID))
+		if (itemRarity and itemRarity < minRarity) then
 			local lootmatch = string.format(LOOT_ITEM, author, "")
 			if string.find(msg, lootmatch) then
 				return true

@@ -355,8 +355,13 @@ local FluffOptions = {
     },
 };
 
+local GetItemInfoFn = _G.GetItemInfo
+if not GetItemInfoFn and C_Item and C_Item.GetItemInfo then
+    GetItemInfoFn = C_Item.GetItemInfo
+end
+
 local function ItemInit(option, button)
-    local n = GetItemInfo(option.id);
+    local n = GetItemInfoFn(option.id);
     if (n) then
         option.text = n;
     else
