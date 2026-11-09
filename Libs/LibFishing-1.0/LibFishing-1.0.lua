@@ -10,7 +10,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 local _
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 101111
+local MINOR_VERSION = 101112
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -699,16 +699,17 @@ end
 local spellidx = nil;
 function FishLib:GetBuff(buffId)
     if ( buffId ) then
+        if ( not C_UnitAuras or not C_UnitAuras.GetAuraDataByIndex ) then
+            return nil, nil;
+        end
+        local wanted = tonumber(buffId) or buffId;
         for idx=1,40 do
-            local current_buff = C_UnitAuras.GetAuraDataByIndex("player", idx);
-            if current_buff then
-                local info = {C_UnitAuras.GetAuraDataByIndex("player", idx)};
-                local spellid = select(10, unpack(info));
-                if (buffId == spellid) then
-                    return idx, info
-                end
-            else
-                return nil, nil
+            local info = C_UnitAuras.GetAuraDataByIndex("player", idx);
+            if ( not info ) then
+                break;
+            end
+            if ( info.spellId and wanted == info.spellId ) then
+                return idx, info;
             end
         end
     end
@@ -717,13 +718,14 @@ end
 
 function FishLib:HasBuff(buffId, skipWait)
     if ( buffId ) then
+        local wanted = tonumber(buffId) or buffId;
         -- if we're waiting, assume we're going to have it
-        if ( not skipWait and BuffWatch[buffId] ) then
+        if ( not skipWait and BuffWatch[wanted] ) then
             return true, GetTime() + 10
         else
-            local idx, info = self:GetBuff(buffId);
+            local idx, info = self:GetBuff(wanted);
             if idx then
-                local et = select(6, unpack(info));
+                local et = info.expirationTime;
                 return true, et;
             end
         end
@@ -733,10 +735,11 @@ end
 
 function FishLib:CancelBuff(buffId)
     if buffId then
-        if BuffWatch[buffId] then
-            BuffWatch[buffId] = nil
+        local wanted = tonumber(buffId) or buffId;
+        if BuffWatch[wanted] then
+            BuffWatch[wanted] = nil
         end
-        local idx, info = self:GetBuff(buffId);
+        local idx, info = self:GetBuff(wanted);
         if idx then
             CancelUnitBuff("player", idx)
         end
@@ -2510,7 +2513,20 @@ function FishLib:GetPoleBonus()
         local poleslot = IsRetail() and INVSLOT_FISHING_TOOL or INVSLOT_MAINHAND;
         -- get the total bonus for the pole
         local total = self:FishingBonusPoints(poleslot, true);
-        local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
+        local hmhe = false;
+        if ( IsRetail() and C_PaperDollInfo and C_PaperDollInfo.GetTemporaryEnchantmentInfo ) then
+            local ok, info = pcall(C_PaperDollInfo.GetTemporaryEnchantmentInfo, poleslot);
+            if ( ok and info ) then
+                if ( type(info) == "table" ) then
+                    hmhe = not not (info.hasTempEnchant or info.enchantID or (info.expiration and info.expiration > 0));
+                else
+                    hmhe = not not info;
+                end
+            end
+        else
+            local mh,_,_,_,_,_ = GetWeaponEnchantInfo();
+            hmhe = mh;
+        end
         if ( hmhe ) then
             local id;
             -- IsFishingPole has set mainhand for us

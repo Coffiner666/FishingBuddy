@@ -29,6 +29,24 @@ if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
     end
 end
 
+local function GetItemNameSafe(itemID)
+    if ( type(GetItemInfoFn) == "function" ) then
+        local okay, name = pcall(GetItemInfoFn, itemID);
+        if (okay and name) then
+            return name;
+        end
+    end
+    if ( C_Item and type(C_Item.GetItemInfo) == "function" ) then
+        local okay, info = pcall(C_Item.GetItemInfo, itemID);
+        if (okay and info) then
+            if ( type(info) == "table" ) then
+                return info.itemName;
+            end
+            return info;
+        end
+    end
+end
+
 -- wrap settings
 local FBGetSetting = function(...) return FBI:GetSetting(...); end;
 local FBGetSettingBool = function(...) return FBI:GetSettingBool(...); end;
@@ -52,14 +70,35 @@ local FluffEvents = {};
 local unTrack = nil;
 local resetPVP = nil;
 
+local function DeferredEnableFindFish(findid, tries)
+    if ( not findid or not C_Minimap or not C_Minimap.SetTracking ) then
+        return;
+    end
+    if ( UnitChannelInfo("player") or UnitCastingInfo("player") ) then
+        if ( tries > 0 ) then
+            C_Timer.After(0.1, function()
+                DeferredEnableFindFish(findid, tries - 1);
+            end);
+        end
+        return;
+    end
+    C_Minimap.SetTracking(findid, true);
+end
+
 function FBI:FishTrackingEnable(enabled)
     local findid = FL:GetFindFishID();
-    if ( findid ) then
+    if ( findid and C_Minimap and C_Minimap.GetTrackingInfo and C_Minimap.SetTracking ) then
+        local t1, _, t3 = C_Minimap.GetTrackingInfo(findid);
+        local active;
+        if ( type(t1) == "table" ) then
+            active = t1.active;
+        else
+            active = t3;
+        end
         if enabled then
-            local _, _, active, _ = C_Minimap.GetTrackingInfo(findid);
             if (not active) then
                 unTrack = true;
-                C_Minimap.SetTracking(findid, true);
+                DeferredEnableFindFish(findid, 50);
             end
         elseif unTrack then
             unTrack = false;
@@ -366,7 +405,7 @@ local FluffOptions = {
 };
 
 local function ItemInit(option, button)
-    local n = GetItemInfoFn and GetItemInfoFn(option.id);
+    local n = GetItemNameSafe(option.id);
     if (n) then
         option.text = n;
     else

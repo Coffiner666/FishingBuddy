@@ -1,3 +1,12 @@
+Version 1.27.4
+- Fix Retail nil-call in FishingFluff option initialization (e.g., Bladebone Hook setup) by hardening item-name lookup with callable checks and safe fallback handling when item info APIs are unavailable.
+- Fix Retail error in FishingDatabase AddFishie color resolution when C_Item.GetItemQualityColor returns numeric/tuple values by handling both ColorMixin and legacy tuple return shapes safely.
+- Fix Easy Cast modifier gating regression for `None`: start-cast checks now correctly allow first casts when no modifier key is configured.
+- Fix Find Fish tracking startup behavior by deferring C_Minimap.SetTracking until player casting/channeling clears, and handle C_Minimap.GetTrackingInfo table-return active state correctly (with legacy fallback).
+- Fix LibFishing buff detection on Retail by reading C_UnitAuras.GetAuraDataByIndex as AuraData tables (including expirationTime) instead of tuple unpacking assumptions.
+- Fix Retail pole-lure detection in LibFishing GetPoleBonus by using C_PaperDollInfo.GetTemporaryEnchantmentInfo for fishing tool slot awareness.
+- Bump LibFishing-1.0 MINOR_VERSION so LibStub prefers this updated copy over older bundled versions.
+
 Version 1.27.3
 - Fix Retail nil-call risk in FishingGearManager outfit scanning/scoring when legacy EquipmentManager_UnpackLocation is unavailable by adding compatibility-safe unpack fallback handling.
 - Fix remaining direct runtime GetItemCount nil-call risks by using compatibility-safe item-count fallback handling in FishingBuddy AutoOpen, FishingExtravaganza contest tracking, FishingPlans/Baits, FishingQuests, and FishingRaid.

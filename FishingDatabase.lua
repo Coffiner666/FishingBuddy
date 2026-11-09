@@ -311,9 +311,18 @@ local function GetQualityColorHex(quality)
 		end
 	end
 	if ( C_Item and C_Item.GetItemQualityColor ) then
-		local color = C_Item.GetItemQualityColor(q);
-		if ( color and color.GenerateHexColor ) then
-			return "|c"..color:GenerateHexColor();
+		local c1, c2, c3, c4 = C_Item.GetItemQualityColor(q);
+		if ( type(c1) == "table" and c1.GenerateHexColor ) then
+			return "|c"..c1:GenerateHexColor();
+		end
+		if ( type(c4) == "string" and c4 ~= "" ) then
+			if ( strsub(c4, 1, 2) == "|c" ) then
+				return c4;
+			end
+			if ( strsub(c4, 1, 8) == "ff" or strsub(c4, 1, 8) == "FF" ) then
+				return "|c"..c4;
+			end
+			return "|cff"..c4;
 		end
 	end
 	if ( ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[q] and ITEM_QUALITY_COLORS[q].hex ) then
