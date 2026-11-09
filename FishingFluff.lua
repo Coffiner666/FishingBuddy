@@ -18,6 +18,16 @@ local GetItemCountFn = _G.GetItemCount;
 if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
     GetItemCountFn = C_Item.GetItemCount;
 end
+local GetItemInfoFn = _G.GetItemInfo;
+if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
+    GetItemInfoFn = function(itemID)
+        local info = C_Item.GetItemInfo(itemID);
+        if ( type(info) == "table" ) then
+            return info.itemName;
+        end
+        return info;
+    end
+end
 
 -- wrap settings
 local FBGetSetting = function(...) return FBI:GetSetting(...); end;
@@ -356,7 +366,7 @@ local FluffOptions = {
 };
 
 local function ItemInit(option, button)
-    local n = GetItemInfo(option.id);
+    local n = GetItemInfoFn and GetItemInfoFn(option.id);
     if (n) then
         option.text = n;
     else

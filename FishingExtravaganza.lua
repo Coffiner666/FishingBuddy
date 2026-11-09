@@ -8,6 +8,10 @@ local FBConstants = FBI.FBConstants;
 FBI.Extravaganza = {};
 
 local FL = LibStub("LibFishing-1.0");
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+	GetItemCountFn = C_Item.GetItemCount;
+end
 
 local UPDATETIME_SCHOOLS = 5.0;
 local UPDATETIME_COUNTER = 20.0;
@@ -353,7 +357,7 @@ FBEnvironment.Extravaganza_OnUpdate = function(self, elapsed)
 		end
 		UpdateTimer = UpdateTimer - elapsed;
 		if ( UpdateTimer <= 0 ) then
-			local numCaught = GetItemCount(CurrentContest.fishid);
+			local numCaught = (GetItemCountFn and GetItemCountFn(CurrentContest.fishid)) or 0;
 			local currentHour,minute = GetGameTime(); -- server time
 			local minleft;
 			local cname = CurrentContest.name;

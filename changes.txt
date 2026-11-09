@@ -1,3 +1,11 @@
+Version 1.27.3
+- Fix Retail nil-call risk in FishingGearManager outfit scanning/scoring when legacy EquipmentManager_UnpackLocation is unavailable by adding compatibility-safe unpack fallback handling.
+- Fix remaining direct runtime GetItemCount nil-call risks by using compatibility-safe item-count fallback handling in FishingBuddy AutoOpen, FishingExtravaganza contest tracking, FishingPlans/Baits, FishingQuests, and FishingRaid.
+- Fix bait override eligibility logic in FishingPlans/Baits by correcting subzone variable usage and passing the active map/subzone context into override checks.
+- Fix AutoOpen fish lookup/return flow by using the active queued fish id for fish-name resolution and return payload generation.
+- Fix option/raid item-info resilience by using compatibility-safe item-info lookup fallbacks and fail-open rarity filtering when item info is unavailable.
+- Fix planner toy API resilience by guarding C_ToyBox usability/info calls in FishingPlans, Bobbers, Rafts, and Items so plan execution safely skips unavailable toy APIs.
+
 Version 1.27.2
 - Fix Retail nil-call in FishingDatabase AddFishie color handling by using a safe quality-color fallback chain (GetItemQualityColor -> C_Item.GetItemQualityColor -> ITEM_QUALITY_COLORS).
 - Fix Retail nil-call in LibFishing GetBestFishingItem when EquipmentManager_UnpackLocation is unavailable; prefer direct links returned by GetInventoryItemsForSlot and guard legacy unpack calls.
@@ -43,7 +51,6 @@ Version 1.26.9
 - Add support for patch 12.0.7 (Revelations). Bump TOC interface to 120007.
 - Fix fish tracking and the Fish Watcher not working on modern Retail. Since patch 10.0.2 fishing poles are profession tools equipped in the dedicated fishing tool slot (INVSLOT_FISHING_TOOL) rather than the main hand, but LibFishing's IsFishingPole() only inspected the main-hand slot, so pole detection failed. Because catch recording and the watcher key off pole detection, neither worked. IsFishingPole() now recognizes a pole in the fishing tool slot on Retail (falling back to the classic main-hand check on Classic).
 - Fix GetPoleBonus() reading the pole's fishing-skill bonus from the empty main-hand slot on Retail (it now reads the fishing tool slot), so the pole's skill bonus is counted again.
-Version 1.26.9
 - Fix FishingMacro.lua error when MAX_ACCOUNT_MACROS / MAX_CHARACTER_MACROS are nil on Retail by using safe macro limit resolution and GetNumMacros()-based indexing.
 - Fix FishingWatcher.lua OnUpdate error by replacing direct MouseIsOver(...) calls with a Retail-safe frame mouseover compatibility check.
 

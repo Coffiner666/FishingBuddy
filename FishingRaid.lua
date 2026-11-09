@@ -10,6 +10,21 @@ local _
 
 local FL = LibStub("LibFishing-1.0");
 local FWF = FBI.FWF;
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+	GetItemCountFn = C_Item.GetItemCount;
+end
+local GetItemInfoFn = _G.GetItemInfo;
+if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
+	GetItemInfoFn = function(itemID)
+		local info = C_Item.GetItemInfo(itemID);
+		if ( type(info) == "table" ) then
+			return info.itemName, info.itemLink, info.quality;
+		end
+		local name, link, quality = C_Item.GetItemInfo(itemID);
+		return name, link, quality;
+	end
+end
 
 local GSB = function(...) return FBI:GetSettingBool(...); end;
 
@@ -363,7 +378,7 @@ tinsert(copyfuncs, "BAG_UPDATE_COOLDOWN");
 function FBR:BAG_UPDATE_DELAYED()
 	self:Update()
 	if (self:IsShown() and self.itemLink) then
-		local count = GetItemCount(self.itemLink)
+		local count = (GetItemCountFn and GetItemCountFn(self.itemLink)) or 0
 		self.Count:SetText(count and count > 1 and count or '')
 	end
 end
@@ -401,7 +416,7 @@ function FBR:SetItem(itemLink, texture)
         _, self.itemID, self.itemName = FL:SplitLink(itemLink, true);
 		self.itemLink = itemLink
 
-		local count = GetItemCount(self.itemLink)
+		local count = (GetItemCountFn and GetItemCountFn(self.itemLink)) or 0
 		self.Count:SetText(count and count > 1 and count or '')
     end
 
@@ -475,7 +490,7 @@ function FBR:Update()
 		local boss = CurrentBoss()
 		if boss then
 			local fishid = boss.fish.id;
-			local numItems = GetItemCount(fishid)
+			local numItems = (GetItemCountFn and GetItemCountFn(fishid)) or 0
 			if numItems > 0 then
 				local itemLink, texture = FL:GetItemInfoFields(fishid, FL.ITEM_LINK, FL.ITEM_ICON);
 				self:SetItem(itemLink, texture)
@@ -517,8 +532,11 @@ local function SilenceOfTheFishies(self, _, msg, author, ...)
 		return false, msg, author, ...
 	else
 		local itemID = select(3, string.find(msg, "item:(%d+):"))
-		local itemRarity = select(3, GetItemInfo(itemID))
-		if (itemRarity < minRarity) then
+		local itemRarity = nil;
+		if ( itemID and GetItemInfoFn ) then
+			itemRarity = select(3, GetItemInfoFn(itemID))
+		end
+		if (itemRarity and itemRarity < minRarity) then
 			local lootmatch = string.format(LOOT_ITEM, author, "")
 			if string.find(msg, lootmatch) then
 				return true
@@ -593,7 +611,7 @@ RaidEvents[FBConstants.INVENTORY_EVT] = function(...)
 		local boss = CurrentBoss()
 		if boss then
 			local fishid = boss.fish.id;
-			local numItems = GetItemCount(fishid)
+			local numItems = (GetItemCountFn and GetItemCountFn(fishid)) or 0
 			if numItems > 0 then
 				if not shown then
 					button:Update()

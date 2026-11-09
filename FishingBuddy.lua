@@ -11,6 +11,10 @@ local  FBI = FBStorage
 local FL = LibStub("LibFishing-1.0");
 local HBD = FL.HBD;
 local LO = LibStub("LibOptionsFrame-1.0");
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
 
 FBEnvironment = {};
 local FBConstants = {};
@@ -1289,14 +1293,15 @@ function FBI:GetUpdateLure()
         -- Is this a quest fish we should open up?
         if ( GSB("AutoOpen") ) then
             while ( table.getn(OpenThisFishId) > 0 ) do
-                local c = GetItemCount(OpenThisFishId[1]);
+                local fishid = OpenThisFishId[1];
+                local c = (GetItemCountFn and GetItemCountFn(fishid)) or 0;
                 if (c < 2) then
                     table.remove(OpenThisFishId, 1);
                 end
                 if ( c > 0 ) then
                     DoAutoOpenLoot = true;
-                    local _,_,_,_,_,fname,_ = self:GetFishieRaw(id);
-                    return true, id, fname;
+                    local _,_,_,_,_,fname,_ = self:GetFishieRaw(fishid);
+                    return true, fishid, fname;
                 end
             end
         end

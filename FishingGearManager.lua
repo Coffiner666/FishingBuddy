@@ -7,6 +7,10 @@ local FBConstants = FBI.FBConstants;
 local _
 
 local FL = LibStub("LibFishing-1.0");
+local UnpackLocation = EquipmentManager_UnpackLocation;
+if ( not UnpackLocation and C_EquipmentSet and C_EquipmentSet.UnpackLocation ) then
+	UnpackLocation = C_EquipmentSet.UnpackLocation;
+end
 
 local function GetEquipmentSetInfoByName(name)
 	local setId = C_EquipmentSet.GetEquipmentSetID(name);
@@ -166,9 +170,9 @@ local function GuessCurrentOutfit()
 	for set = 0, numsets-1 do
 		ret[set+1] = 0;
 		local location_array = C_EquipmentSet.GetItemLocations(set);
-		if (location_array) then
+		if (location_array and UnpackLocation) then
 			for _,location in pairs(location_array) do
-				local onplayer, _, bags, _, _, _ = EquipmentManager_UnpackLocation(location);
+				local onplayer, _, bags, _, _, _ = UnpackLocation(location);
 				if onplayer and not bags then
 					ret[set+1] = ret[set+1] + 1;
 				end
@@ -230,7 +234,10 @@ local function OutfitPoints(outfit)
 		local items = GetEquipmentSetLocations(outfit);
 		for _,loc in pairs(items) do
 			local bags, bag, slot
-			_, _, bags, _, slot, bag = EquipmentManager_UnpackLocation(loc);
+			if ( not UnpackLocation ) then
+				break;
+			end
+			_, _, bags, _, slot, bag = UnpackLocation(loc);
 			local link;
 			if ( not bags ) then -- and (player or bank)
 				link = GetInventoryItemLink("player", slot);

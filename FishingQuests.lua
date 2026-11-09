@@ -8,6 +8,10 @@ local _
 
 local LEW = LibStub("LibEventWindow-1.0");
 local GSB = function(...) return FBI:GetSettingBool(...); end;
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+	GetItemCountFn = C_Item.GetItemCount;
+end
 
 -- DragonFlight Quest Fish Tracking
 QuestFish = {}
@@ -105,7 +109,7 @@ local function HasRequiredQuestItem(questID)
 	if not itemID then
 		return false
 	end
-	return GetItemCount(itemID) > 0
+	return ((GetItemCountFn and GetItemCountFn(itemID)) or 0) > 0
 end
 
 local function procLunkerQuests(index, title, level, isTrivial, frequency, isRepeatable, isLegendary, questID, ...)
@@ -147,7 +151,7 @@ _fqframe:Register('GOSSIP_SHOW', function()
 			local reputationInfo = C_GossipInfo.GetFriendshipReputation(1975);
 			--  if max rank, don't do turn-in
 			if (reputationInfo.nextThreshold  and GSB("DrownedMana")) then
-				local mana = GetItemCount(138777);
+				local mana = (GetItemCountFn and GetItemCountFn(138777)) or 0;
 				local options = C_GossipInfo.GetOptions()
 				if (mana >= 10) then
 					C_GossipInfo.SelectOption(options[5].gossipOptionID)
@@ -205,7 +209,7 @@ QuestEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, mapId, subzone, tex
 					limit = QuestFish[id].limit
 				end
 				if limit > 0 then
-					local fishcount = GetItemCount(id);
+					local fishcount = (GetItemCountFn and GetItemCountFn(id)) or 0;
 					local postfix = "("..fishcount.."/"..limit..")"
 					FBI:QuestFishAlert(id, postfix)
 					noises = fishcount >= limit

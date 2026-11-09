@@ -140,10 +140,12 @@ end
 local function PickRandomBobber(bobbersetting)
 	local baits = {};
 	for _,id in ipairs(bobbersetting) do
-		if (PlayerHasToyFn(id) and C_ToyBox.IsToyUsable(id)) then
+		if (PlayerHasToyFn(id) and C_ToyBox and C_ToyBox.IsToyUsable and C_ToyBox.IsToyUsable(id)) then
 			if not PLANS:ItemCooldownOn(id) then
-				id = C_ToyBox.GetToyInfo(id);
-				tinsert(baits, id);
+				if (C_ToyBox.GetToyInfo) then
+					id = C_ToyBox.GetToyInfo(id);
+					tinsert(baits, id);
+				end
 			end
 		end
 	end
@@ -158,11 +160,13 @@ local function UseThisBobber(itemid, info)
     local itemtype;
     if (info.toy) then
         canuse = false
-		if (PlayerHasToyFn(itemid) and C_ToyBox.IsToyUsable(itemid)) then
+		if (PlayerHasToyFn(itemid) and C_ToyBox and C_ToyBox.IsToyUsable and C_ToyBox.IsToyUsable(itemid)) then
 			if not PLANS:ItemCooldownOn(itemid) then
-                itemid = C_ToyBox.GetToyInfo(itemid);
-                canuse = true
-                itemtype = "toy"
+				if (C_ToyBox.GetToyInfo) then
+					itemid = C_ToyBox.GetToyInfo(itemid);
+					canuse = true
+					itemtype = "toy"
+				end
             end
         end
     else
@@ -282,10 +286,12 @@ if ( FBI.Debugging ) then
 		function()
 			local baits = {};
 			for _,id in ipairs(bobberkeys) do
-				if (PlayerHasToyFn(id) and C_ToyBox.IsToyUsable(id)) then
+				if (PlayerHasToyFn(id) and C_ToyBox and C_ToyBox.IsToyUsable and C_ToyBox.IsToyUsable(id)) then
 					if not PLANS:ItemCooldownOn(id) then
-						id = C_ToyBox.GetToyInfo(id);
-						tinsert(baits, id);
+						if (C_ToyBox.GetToyInfo) then
+							id = C_ToyBox.GetToyInfo(id);
+							tinsert(baits, id);
+						end
 					end
 				end
 			end

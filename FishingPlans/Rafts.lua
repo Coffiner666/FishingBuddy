@@ -134,12 +134,16 @@ local function RaftingPlan(queue)
         buff = RaftItems[itemid].spell;
         name = RaftItems[itemid][CurLoc];
         if RaftItems[itemid].toy then
-            _, itemid = C_ToyBox.GetToyInfo(BOARD_ID)
+            if (C_ToyBox and C_ToyBox.GetToyInfo) then
+                _, itemid = C_ToyBox.GetToyInfo(BOARD_ID)
+            else
+                itemid = nil;
+            end
         end
         if buff then
             local _, et = FL:HasAnyBuff(RaftItems)
             et = (et or 0) - GetTime();
-            if (need or et <= RAFT_RESET_TIME) then
+            if ((need or et <= RAFT_RESET_TIME) and itemid) then
                 PLANS:AddEntry(itemid, name)
             end
         end
@@ -171,8 +175,8 @@ FBI.Commands["raft"].func =
             },
             ["SurfaceTension"] = GSB("OverWalking"),
             ["HaveRaft"] = PlayerHasToyFn and PlayerHasToyFn(RAFT_ID),
-            ["UseableRaft"] = C_ToyBox.IsToyUsable(RAFT_ID),
-            ["RaftInfo"] = C_ToyBox.GetToyInfo(RAFT_ID),
+            ["UseableRaft"] = C_ToyBox and C_ToyBox.IsToyUsable and C_ToyBox.IsToyUsable(RAFT_ID),
+            ["RaftInfo"] = C_ToyBox and C_ToyBox.GetToyInfo and C_ToyBox.GetToyInfo(RAFT_ID),
             ["BergCount"] = GetItemCountFn and GetItemCountFn(BERG_ID),
             ["Maintain"] = GSB("BergMaintainOnly"),
             ["UseBerg"] = GSB("UseBobbingBerg"),

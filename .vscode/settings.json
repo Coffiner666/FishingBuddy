@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^Set-Location \"c:\\\\Program Files \\(x86\\)\\\\World of Warcraft\\\\_retail_\\\\Interface\\\\AddOns\\\\FishingBuddy\"; if \\(-not \\(Test-Path \"specs\"\\)\\) \\{ New-Item -ItemType Directory -Path \"specs\" \\| Out-Null \\}; Move-Item -Path \"SPEC_RETAIL_COMPAT_1\\.27\\.3\\.md\" -Destination \"specs\\\\\"; Move-Item -Path \"spec-splits\" -Destination \"specs\\\\\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

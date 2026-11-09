@@ -9,6 +9,10 @@ local FBConstants = FBI.FBConstants;
 local _
 
 local FL = LibStub("LibFishing-1.0");
+local GetItemCountFn = _G.GetItemCount;
+if ( not GetItemCountFn and C_Item and C_Item.GetItemCount ) then
+    GetItemCountFn = C_Item.GetItemCount;
+end
 
 local GSB = function(...) return FBI:GetSettingBool(...); end;
 local PLANS = FBI.FishingPlans
@@ -212,13 +216,14 @@ local function ValidOverride(info, mapId, subzone)
     if check == info.override then
         return true
     end
-    return mapId and subZone and check[mapId] and check[mapId][subzone]
+    return mapId and subzone and check[mapId] and check[mapId][subzone]
 end
 
 local function CheckBait(baitid)
     local baitinfo = Maintainable[baitid];
     local got_bait = FL:HasBuff(baitinfo.spell)
-    if (GetItemCount(baitid) > 0 and not got_bait and not baitinfo.manual) then
+    local baitcount = (GetItemCountFn and GetItemCountFn(baitid)) or 0
+    if (baitcount > 0 and not got_bait and not baitinfo.manual) then
         PLANS:AddEntry(baitinfo.id, baitinfo[CurLoc])
         return true
     end
@@ -248,7 +253,7 @@ local function SpecialBaitPlan(queue)
                     local info = Maintainable[baitid];
                     if info.mapId and lastMap == info.mapId then
                         if info.override and overrides[info.override] then
-                            if ValidOverride(info, mapId, subzone) and CheckBait(info.override) then
+                            if ValidOverride(info, lastMap, subzone) and CheckBait(info.override) then
                                 return
                             end
                         end
@@ -260,7 +265,7 @@ local function SpecialBaitPlan(queue)
                 for _, baitid in ipairs(SpecialBait[continent]) do
                     local info = Maintainable[baitid];
                     if not info.mapId then
-                        if ValidOverride(info) and CheckBait(info.override) then
+                        if ValidOverride(info, lastMap, subzone) and CheckBait(info.override) then
                             return
                         end
                         if CheckBait(baitid) then

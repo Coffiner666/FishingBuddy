@@ -103,8 +103,12 @@ local function TrawlerPlan()
             local start, duration, enable = C_Container.GetItemCooldown(TRAWLER_ID);
             local et = (start + duration) - GetTime();
             if (et <= 0) then
-                local _, itemid =  C_ToyBox.GetToyInfo(TRAWLER_ID);
-                PLANS:AddEntry(itemid, TrawlerTotem[CurLoc])
+                if (C_ToyBox and C_ToyBox.GetToyInfo) then
+                    local _, itemid =  C_ToyBox.GetToyInfo(TRAWLER_ID);
+                    if (itemid) then
+                        PLANS:AddEntry(itemid, TrawlerTotem[CurLoc])
+                    end
+                end
             end
         end
     end
