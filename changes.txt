@@ -1,3 +1,8 @@
+Version 1.27.5
+- Fix Nat's Hookshot usability check in FishingFluff: the `usable` callback now returns its result, a missing quest log entry no longer causes a nil comparison error (also affecting FishingPlans/Baits), and quest objectives are read with C_QuestLog.GetQuestObjectives.
+- Fix Lua error in FishingPlans/Lures when the chosen lure is on cooldown by adding LureStateManager:ClearAddingLure.
+- Fix Extravaganza "STV pools only" hijack check error by exporting FBI:NormalHijackCheck from FishingBuddy.
+
 Version 1.27.4
 - Fix Retail nil-call in FishingFluff option initialization (e.g., Bladebone Hook setup) by hardening item-name lookup with callable checks and safe fallback handling when item info APIs are unavailable.
 - Fix Retail error in FishingDatabase AddFishie color resolution when C_Item.GetItemQualityColor returns numeric/tuple values by handling both ColorMixin and legacy tuple return shapes safely.

@@ -148,13 +148,14 @@ function FBI:IsQuestFishing(item)
     if (GetItemCountFn and GetItemCountFn(116755) > 0) then
         -- Better Nat's quest checking by Bodar (Curse)
         local questLogIndex = C_QuestLog.GetLogIndexForQuestID(36611);
-        if (questLogIndex > 0) then
+        if (questLogIndex and questLogIndex > 0) then
             local currentMapID = FL:GetCurrentMapId();
-            local numObjectives = GetNumQuestLeaderBoards(questLogIndex);
-            for i = 1, numObjectives do
-                local text, objectiveType, finished = GetQuestLogLeaderBoard(i, questLogIndex);
-                if (not finished and currentMapID == objectiveMapID[i]) then
-                    return true;
+            local objectives = C_QuestLog.GetQuestObjectives(36611);
+            if (type(objectives) == "table") then
+                for i, objective in ipairs(objectives) do
+                    if (not objective.finished and currentMapID == objectiveMapID[i]) then
+                        return true;
+                    end
                 end
             end
         end
@@ -218,7 +219,7 @@ FishingItems[122742] = {
 FishingItems[116755] = {
     ["enUS"] = "Nat's Hookshot",
     spell = 171740,
-    usable = function(...) FBI:IsQuestFishing(...); end,
+    usable = function(...) return FBI:IsQuestFishing(...); end,
 };
 
 local LevelingItems = {}

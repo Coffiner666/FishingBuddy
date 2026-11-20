@@ -79,6 +79,9 @@ function LureStateManager:ClearLastLure(checktime)
     end
 end
 
+function LureStateManager:ClearAddingLure()
+    self.AddingLure = false;
+end
 
 FBI.LureStateManager = LureStateManager
 local LSM = LureStateManager

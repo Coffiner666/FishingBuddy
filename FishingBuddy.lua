@@ -1433,6 +1433,10 @@ local function NormalHijackCheck()
     end
 end
 
+function FBI:NormalHijackCheck()
+    return NormalHijackCheck();
+end
+
 local HijackCheck = NormalHijackCheck;
 function FBI:SetHijackCheck(func)
     if ( not func ) then
