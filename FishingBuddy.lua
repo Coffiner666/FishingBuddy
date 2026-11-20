@@ -1594,7 +1594,8 @@ function FBI:ExitFishingMode(logout)
 end
 
 function FBI:FishingMode()
-    local ready = self:ReadyForFishing() or FishingModeFrame:IsShown();
+    -- FishingModeFrame is never hidden, so check whether fishing actually started
+    local ready = self:ReadyForFishing() or FishingModeFrame.fishing_started;
     if ( ready ) then
         EventRegistry:TriggerEvent(FBConstants.FISHING_ENABLED_EVT)
     else
