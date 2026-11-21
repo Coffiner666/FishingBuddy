@@ -496,21 +496,32 @@ function FBI:HasRaftBuff()
     return HaveRaftBuff() or HaveBergBuff() or HaveBoardBuff()
 end
 
-local function AutoPoleCheck(self, ...)
+local AUTOPOLE_CHECK_INTERVAL = 0.5;
+local autopole_elapsed = 0;
+
+local function AutoPoleCheck(self, elapsed)
+    autopole_elapsed = autopole_elapsed + (elapsed or 0);
+    if ( autopole_elapsed < AUTOPOLE_CHECK_INTERVAL ) then
+        return;
+    end
+    autopole_elapsed = 0;
+
     if ( FL:InCombat() ) then
         return;
     end
     if (self.zone) then
         local distance = FL:GetDistanceTo(self.zone, self.x, self.y)
         if distance then
-            if distance > FBI:GetSetting("Enabling_RaftDistance") or (not FBI:HasRaftBuff() and distance > FBI:GetSetting("Enabling_WalkDistance")) then
+            -- only scan for raft buffs when the walking distance is exceeded
+            if distance > FBI:GetSetting("Enabling_RaftDistance") or
+               (distance > FBI:GetSetting("Enabling_WalkDistance") and not FBI:HasRaftBuff()) then
                 self:EmitStopFishing()
             end
         end
     end
     if LastCastTime then
-        local elapsed = (GetTime() - LastCastTime);
-        if ( elapsed > FBI:GetSetting("Enabling_IdleTimeSlider") ) then
+        local idle = (GetTime() - LastCastTime);
+        if ( idle > FBI:GetSetting("Enabling_IdleTimeSlider") ) then
             self:EmitStopFishing()
             return
         end
@@ -955,7 +966,7 @@ FBI.ByFishie = nil;
 FBI.SortedFishies = nil;
 
 function FBI:GetByFishie()
-    return self.BtFishie
+    return self.ByFishie
 end
 
 function FBI:GetSortedFishies()
@@ -1973,7 +1984,7 @@ function FBI:OnEvent(event, ...)
         FBI:CreateFBMappedDropDown("FBMouseEvent", "MouseEvent", FBConstants.CONFIG_MOUSEEVENT_ONOFF, FBConstants.CastingKeyLabel)
 
         FBI.OptionsFrame.HandleOptions(name, "Interface\\Icons\\INV_Fishingpole_02", CastingOptions);
-        FBI.OptionsFrame.HandleOptions(ENABLE, "Interface\\CIons\\IMV\\NV_misc_pocketwatch_03", EnablingOptions);
+        FBI.OptionsFrame.HandleOptions(ENABLE, "Interface\\Icons\\INV_Misc_PocketWatch_03", EnablingOptions);
         FBI.OptionsFrame.HandleOptions(nil, nil, InvisibleOptions);
 
         -- defaults to true

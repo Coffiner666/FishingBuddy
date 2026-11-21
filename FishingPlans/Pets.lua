@@ -221,15 +221,6 @@ PetEvents[FBConstants.LOGIN_EVT] = function()
 	end
 end
 
-PetEvents[FBConstants.LOGIN_EVT] = function()
-	if ( FishingBuddy_Player ) then
-		if ( FishingBuddy_Player["ResetPet"] ) then
-			DoPetReset(FishingBuddy_Player["ResetPet"]);
-			FishingBuddy_Player["ResetPet"] = nil;
-		end
-	end
-end
-
 PetEvents["VARIABLES_LOADED"] = function(started)
 	HandlePetsUpdate();
 	LibPetJournal.RegisterCallback(FBConstants.ID, "PetListUpdated", HandlePetsUpdate)

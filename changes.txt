@@ -1,3 +1,13 @@
+Version 1.27.6
+- Fix "GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted by 'FishingBuddy'" errors (e.g. from the Raid module's magic fish check): LibFishing GetBuff now treats player auras as unavailable when C_Secrets.ShouldAurasBeSecret() is true or an aura's spell id is secret. LibFishing-1.0 MINOR_VERSION bumped.
+- Fix Enhance Fishing Sounds staying on (with boosted volume) after dying and releasing spirit or accepting a resurrect without fishing gear: FBI:FishingMode now checks FishingModeFrame.fishing_started instead of the always-true IsShown(), so FISHING_DISABLED_EVT restores the saved sound settings.
+- Reduce fishing-mode overhead: the walk/raft distance and idle-time check now runs every 0.5 seconds instead of every frame, and raft/berg/waveboard aura scans only happen once the walk distance is exceeded.
+- Fix the Raid module never loading (FishingRaid registered its handlers with the wrong call syntax): the Raid options tab, Pagle fish watcher line, action button and raid loot filter are now active.
+- Fix FBI:GetByFishie always returning nil (misspelled field name).
+- Fix the broken icon path on the Enabling options tab.
+- Remove a duplicated login handler in FishingPlans/Pets.
+- Harden the Raid module for Retail: the loot chat filter ignores restricted (secret) chat data and matches the looter name literally, the action button no longer calls UIParent_ManageFramePositions, and ItemHasRange / ExtraActionButton1 lookups are nil-guarded.
+
 Version 1.27.5
 - Fix Nat's Hookshot usability check in FishingFluff: the `usable` callback now returns its result, a missing quest log entry no longer causes a nil comparison error (also affecting FishingPlans/Baits), and quest objectives are read with C_QuestLog.GetQuestObjectives.
 - Fix Lua error in FishingPlans/Lures when the chosen lure is on cooldown by adding LureStateManager:ClearAddingLure.

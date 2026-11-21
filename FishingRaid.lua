@@ -26,6 +26,8 @@ if ( not GetItemInfoFn and C_Item and C_Item.GetItemInfo ) then
 	end
 end
 
+local ItemHasRangeFn = (C_Item and C_Item.ItemHasRange) or _G.ItemHasRange;
+
 local GSB = function(...) return FBI:GetSettingBool(...); end;
 
 local MARGOSS_RETREAT = "Margoss's Retreat"
@@ -425,7 +427,7 @@ function FBR:SetItem(itemLink, texture)
 	if (key) then
 		HotKey:SetText(GetBindingText(key, 1))
 		HotKey:Show()
-	elseif (itemLink and ItemHasRange(itemLink)) then
+	elseif (itemLink and ItemHasRangeFn and ItemHasRangeFn(itemLink)) then
 		HotKey:SetText(RANGE_INDICATOR)
 		HotKey:Show()
 	else
@@ -518,16 +520,16 @@ end
 
 local function FishingAction_OnHide(self)
 	self:Clear()
-    UIParent_ManageFramePositions();
-end
-
-local function FishingAction_OnShow(self)
-    UIParent_ManageFramePositions();
 end
 
 -- Thanks bsmorgan!
 local minRarity = 2;		-- uncommon
 local function SilenceOfTheFishies(self, _, msg, author, ...)
+	-- chat data can be secret/restricted (e.g. during encounters); don't touch it
+	if (issecretvalue and (issecretvalue(msg) or issecretvalue(author))) or
+	   type(msg) ~= "string" or type(author) ~= "string" then
+		return false, msg, author, ...
+	end
 	if not IsInRaid() or not FBI:ReadyForFishing() or author == UnitName("player") or string.match(msg,'Hbattlepet') then
 		return false, msg, author, ...
 	else
@@ -538,7 +540,7 @@ local function SilenceOfTheFishies(self, _, msg, author, ...)
 		end
 		if (itemRarity and itemRarity < minRarity) then
 			local lootmatch = string.format(LOOT_ITEM, author, "")
-			if string.find(msg, lootmatch) then
+			if string.find(msg, lootmatch, 1, true) then
 				return true
 			end
 		end
@@ -557,7 +559,11 @@ RaidEvents["VARIABLES_LOADED"] = function(started)
 		button[name] = FBR[name];
 	end
 
-	button:SetPoint('CENTER', ExtraActionButton1)
+	if ExtraActionButton1 then
+		button:SetPoint('CENTER', ExtraActionButton1)
+	else
+		button:SetPoint('CENTER', UIParent, 'CENTER', 0, -150)
+	end
 
 	button:SetHighlightTexture([[Interface\Buttons\ButtonHilight-Square]])
 	button:SetPushedTexture([[Interface\Buttons\CheckButtonHilight]])
@@ -565,7 +571,6 @@ RaidEvents["VARIABLES_LOADED"] = function(started)
 
     button:SetFrameLevel(button:GetFrameLevel() + 2);
     button:SetScript("OnHide", FishingAction_OnHide)
-    button:SetScript("OnShow", FishingAction_OnShow)
     button:SetScript('OnEvent', function(self, event, ...)
         if(self[event]) then
             self[event](self, event, ...)
@@ -626,5 +631,5 @@ RaidEvents[FBConstants.INVENTORY_EVT] = function(...)
 	end
 end
 
-FBI.RegisterHandlers(RaidEvents);
+FBI:RegisterHandlers(RaidEvents);
 

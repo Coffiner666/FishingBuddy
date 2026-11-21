@@ -10,7 +10,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 local _
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 101112
+local MINOR_VERSION = 101113
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -702,13 +702,21 @@ function FishLib:GetBuff(buffId)
         if ( not C_UnitAuras or not C_UnitAuras.GetAuraDataByIndex ) then
             return nil, nil;
         end
+        -- player auras are secret in restricted situations (e.g. combat); treat as unavailable
+        if ( C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() ) then
+            return nil, nil;
+        end
         local wanted = tonumber(buffId) or buffId;
         for idx=1,40 do
             local info = C_UnitAuras.GetAuraDataByIndex("player", idx);
             if ( not info ) then
                 break;
             end
-            if ( info.spellId and wanted == info.spellId ) then
+            local spellId = info.spellId;
+            if ( issecretvalue and issecretvalue(spellId) ) then
+                return nil, nil;
+            end
+            if ( spellId and wanted == spellId ) then
                 return idx, info;
             end
         end
